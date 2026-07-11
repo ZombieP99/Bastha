@@ -54,7 +54,7 @@ export default function TrendingProducts({ dict, lang }: { dict: any, lang: stri
     }
   };
 
-  const itemVariants = {
+  const itemVariants: import('framer-motion').Variants = {
     hidden: { opacity: 0, y: 30 },
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };

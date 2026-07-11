@@ -7,10 +7,10 @@ import { getDictionary } from '@/i18n/dictionaries';
 export default async function Home({
   params,
 }: {
-  params: { lang: 'en' | 'ar' };
+  params: Promise<{ lang: string }>;
 }) {
   const resolvedParams = await params;
-  const { lang } = resolvedParams;
+  const lang = resolvedParams.lang as 'en' | 'ar';
   const dict = await getDictionary(lang);
 
   return (

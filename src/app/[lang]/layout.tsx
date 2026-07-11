@@ -27,11 +27,11 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: 'en' | 'ar' };
+  params: Promise<{ lang: string }>;
 }>) {
   // Await params as required by Next.js 15+ 
   const resolvedParams = await params;
-  const { lang } = resolvedParams;
+  const lang = resolvedParams.lang as 'en' | 'ar';
   
   const dict = await getDictionary(lang);
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
