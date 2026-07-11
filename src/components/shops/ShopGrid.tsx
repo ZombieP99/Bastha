@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Store } from 'lucide-react';
+import { ChevronDown, Store, Clock, Star, Flame } from 'lucide-react';
 import ShopCard, { Shop } from './ShopCard';
 import ShopFilters from './ShopFilters';
 import SkeletonShopCard from './SkeletonShopCard';
@@ -51,73 +51,73 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
     {
       id: 1, name: isAr ? 'مخبز اليازجي' : 'Al-Yazji Bakery', description: isAr ? 'مخبوزات وكعك محلي طازج' : 'Fresh local baked goods and cakes',
       coverImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'م' : 'YB'}&background=1a365d&color=fff&size=200`,
+      logo: '',
       rating: 4.8, tags: [dict?.shopsPage?.categories?.restaurants, dict?.shopsPage?.categories?.sweets]
     },
     {
       id: 2, name: isAr ? 'أزياء سمر' : 'Samar Fashion', description: isAr ? 'أحدث صيحات الموضة النسائية' : 'Latest women fashion trends',
       coverImage: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'س' : 'SF'}&background=eab308&color=1a365d&size=200`,
+      logo: '',
       rating: 4.6, tags: [dict?.shopsPage?.categories?.fashion]
     },
     {
       id: 3, name: isAr ? 'مجوهرات الشرفا' : 'Al-Shorafa Jewelry', description: isAr ? 'أرقى المصوغات الذهبية والماس' : 'Finest gold and diamond jewelry',
       coverImage: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ش' : 'SJ'}&background=1a365d&color=eab308&size=200`,
+      logo: '',
       rating: 4.9, tags: [dict?.shopsPage?.categories?.jewelry, dict?.shopsPage?.categories?.gifts]
     },
     {
       id: 4, name: isAr ? 'تقنية الرائد' : 'Al-Raed Tech', description: isAr ? 'أجهزة ذكية وإلكترونيات حديثة' : 'Smart devices and modern electronics',
       coverImage: 'https://images.unsplash.com/photo-1531297172867-4d6537f05218?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ر' : 'RT'}&background=333&color=fff&size=200`,
+      logo: '',
       rating: 4.7, tags: [dict?.categories?.items?.electronics]
     },
     {
       id: 5, name: isAr ? 'حلويات العمدة' : 'Al-Omda Sweets', description: isAr ? 'حلويات شرقية وغربية فاخرة' : 'Premium eastern and western sweets',
       coverImage: 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ع' : 'OS'}&background=8b5cf6&color=fff&size=200`,
+      logo: '',
       rating: 4.8, tags: [dict?.shopsPage?.categories?.sweets]
     },
     {
       id: 6, name: isAr ? 'عطارة الشام' : 'Al-Sham Herbs', description: isAr ? 'أعشاب طبيعية وزيوت عضوية' : 'Natural herbs and organic oils',
       coverImage: 'https://images.unsplash.com/photo-1611077544346-646e7f827a5e?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ع' : 'SH'}&background=16a34a&color=fff&size=200`,
+      logo: '',
       rating: 4.5, tags: [dict?.shopsPage?.categories?.organic, dict?.shopsPage?.categories?.beauty]
     },
     {
       id: 7, name: isAr ? 'مطعم البيك' : 'Al-Baik Restaurant', description: isAr ? 'أشهى المأكولات والوجبات السريعة' : 'Delicious fast food meals',
       coverImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ب' : 'BR'}&background=ef4444&color=fff&size=200`,
+      logo: '',
       rating: 4.6, tags: [dict?.shopsPage?.categories?.restaurants]
     },
     {
       id: 8, name: isAr ? 'حقائب الأناقة' : 'Elegance Bags', description: isAr ? 'حقائب جلدية أصلية' : 'Authentic leather bags',
       coverImage: 'https://images.unsplash.com/photo-1548863227-3af567fc3b27?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ح' : 'EB'}&background=d97706&color=fff&size=200`,
+      logo: '',
       rating: 4.4, tags: [dict?.shopsPage?.categories?.fashion, dict?.shopsPage?.categories?.leather]
     },
     {
       id: 9, name: isAr ? 'الرياضي الأول' : 'First Athlete', description: isAr ? 'مستلزمات رياضية احترافية' : 'Professional sports equipment',
       coverImage: 'https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ر' : 'FA'}&background=2563eb&color=fff&size=200`,
+      logo: '',
       rating: 4.7, tags: [dict?.shopsPage?.categories?.sports]
     },
     {
       id: 10, name: isAr ? 'عالم الأطفال' : 'Kids World', description: isAr ? 'ألعاب آمنة وتطويرية للأطفال' : 'Safe and developmental kids toys',
       coverImage: 'https://images.unsplash.com/photo-1558066160-58c9735d4872?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'أ' : 'KW'}&background=ec4899&color=fff&size=200`,
+      logo: '',
       rating: 4.8, tags: [dict?.categories?.items?.toys, dict?.shopsPage?.categories?.gifts]
     },
     {
       id: 11, name: isAr ? 'مكتبة اقرأ' : 'Iqra Library', description: isAr ? 'أحدث الكتب والروايات العالمية' : 'Latest books and international novels',
       coverImage: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ق' : 'IL'}&background=14b8a6&color=fff&size=200`,
+      logo: '',
       rating: 4.9, tags: [dict?.categories?.items?.toys] // Books can fall under this or gifts
     },
     {
       id: 12, name: isAr ? 'لمسة جمال' : 'Beauty Touch', description: isAr ? 'مستحضرات تجميل أصلية' : 'Original cosmetics',
       coverImage: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop',
-      logo: `https://ui-avatars.com/api/?name=${isAr ? 'ج' : 'BT'}&background=f43f5e&color=fff&size=200`,
+      logo: '',
       rating: 4.3, tags: [dict?.shopsPage?.categories?.beauty]
     }
   ];
@@ -161,6 +161,12 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
     return dict?.shopsPage?.filters?.popular;
   };
 
+  const getSortIcon = (option: SortOption) => {
+    if (option === 'newest') return <Clock className="w-4 h-4" />;
+    if (option === 'topRated') return <Star className="w-4 h-4" />;
+    return <Flame className="w-4 h-4" />;
+  };
+
   return (
     <section className="container mx-auto px-4 md:px-8 py-8 md:py-12">
       
@@ -174,9 +180,12 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
         <div className="relative" ref={dropdownRef}>
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 bg-[#f0f4f8] text-[#1a365d] px-5 py-2.5 rounded-xl font-bold border border-transparent hover:border-gray-200 transition-colors"
+            className={`flex items-center gap-2 bg-[#f0f4f8] text-[#1a365d] px-5 py-2.5 rounded-xl font-bold border border-transparent hover:border-gray-200 transition-colors ${isAr ? 'flex-row-reverse' : 'flex-row'}`}
           >
-            {getSortLabel(sortOrder)}
+            <div className={`flex items-center gap-2 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
+              {getSortIcon(sortOrder)}
+              <span>{getSortLabel(sortOrder)}</span>
+            </div>
             <motion.div animate={{ rotate: isDropdownOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
               <ChevronDown className="w-4 h-4" />
             </motion.div>
@@ -189,9 +198,9 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className={`absolute z-30 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden ${isAr ? 'left-0' : 'right-0'}`}
+                className={`absolute z-30 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden ${isAr ? 'left-0' : 'right-0'}`}
               >
-                <div className="py-1">
+                <div className="py-2 flex flex-col">
                   {(['newest', 'topRated', 'popular'] as SortOption[]).map((option) => (
                     <button
                       key={option}
@@ -199,11 +208,12 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
                         setSortOrder(option);
                         setIsDropdownOpen(false);
                       }}
-                      className={`w-full px-4 py-2 text-sm font-bold transition-colors ${
-                        isAr ? 'text-right' : 'text-left'
+                      className={`w-full px-5 py-3 text-sm font-bold transition-colors flex items-center gap-3 ${
+                        isAr ? 'flex-row-reverse text-right' : 'flex-row text-left'
                       } ${sortOrder === option ? 'bg-[#1a365d]/5 text-[#1a365d]' : 'text-gray-600 hover:bg-gray-50'}`}
                     >
-                      {getSortLabel(option)}
+                      {getSortIcon(option)}
+                      <span>{getSortLabel(option)}</span>
                     </button>
                   ))}
                 </div>

@@ -38,15 +38,9 @@ export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: any; 
 
       {/* Content */}
       <div className="p-6 flex flex-col flex-1 relative z-20">
-        <div className={`flex items-start justify-between gap-4 mb-4 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
-           <div className={`w-16 h-16 rounded-2xl overflow-hidden border-2 border-white shadow-sm flex-shrink-0 bg-white -mt-12 z-20`}>
-              <img src={shop.logo} alt={shop.name} className="w-full h-full object-cover" />
-           </div>
-           
-           <div className={`flex-1 ${isAr ? 'text-right' : 'text-left'}`}>
-              <h3 className="font-extrabold text-xl text-[#1a365d] mb-1">{shop.name}</h3>
-              <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{shop.description}</p>
-           </div>
+        <div className={`flex flex-col gap-2 mb-4 ${isAr ? 'text-right' : 'text-left'}`}>
+           <h3 className="font-extrabold text-xl text-[#1a365d] mb-1">{shop.name}</h3>
+           <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{shop.description}</p>
         </div>
 
         {/* Tags */}

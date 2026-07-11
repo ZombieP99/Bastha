@@ -23,7 +23,8 @@ export default function ShopFilters({
   
   // Extract categories from dictionary
   const rawCategories = dict?.shopsPage?.categories || {};
-  const categories = [dict?.shopsPage?.allCategories, ...Object.values(rawCategories)] as string[];
+  const allCategory = dict?.shopsPage?.allCategories || 'All';
+  const categories = Object.values(rawCategories) as string[];
 
   return (
     <div className="flex flex-col gap-6 mb-10">
@@ -47,7 +48,26 @@ export default function ShopFilters({
       </div>
 
       {/* Category Pills */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x justify-start md:justify-center">
+      <div className={`flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x justify-start md:justify-center ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
+        
+        {/* Distinctive All Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setActiveCategory(allCategory)}
+          className={`snap-center whitespace-nowrap px-6 py-2.5 rounded-2xl font-extrabold text-sm transition-all shadow-sm border-2 ${
+            (activeCategory === allCategory || !activeCategory)
+              ? 'bg-gradient-to-r from-[#1a365d] to-[#2b4c7e] text-white border-transparent' 
+              : 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200'
+          }`}
+        >
+          {allCategory}
+        </motion.button>
+
+        {/* Separator Divider */}
+        <div className="w-px h-8 bg-gray-200 mx-1 flex-shrink-0 rounded-full"></div>
+
+        {/* Other Categories */}
         {categories.map((category, idx) => {
           const isActive = activeCategory === category;
           return (
@@ -56,10 +76,10 @@ export default function ShopFilters({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveCategory(category)}
-              className={`snap-center whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all shadow-sm ${
+              className={`snap-center whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all shadow-sm border ${
                 isActive 
-                  ? 'bg-[#1a365d] text-white' 
-                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
+                  ? 'bg-[#1a365d] text-white border-transparent' 
+                  : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700 border-gray-100'
               }`}
             >
               {category}
