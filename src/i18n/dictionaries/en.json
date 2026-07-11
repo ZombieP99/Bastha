@@ -1,0 +1,76 @@
+{
+  "common": {
+    "searchPlaceholder": "Search for products, stores, or offers...",
+    "login": "Login",
+    "register": "Sign Up Free",
+    "currency": "₪"
+  },
+  "nav": {
+    "home": "Home",
+    "categories": "Categories",
+    "featuredStores": "Featured Stores",
+    "bestOffers": "Best Offers",
+    "newArrivals": "New Arrivals",
+    "bestSellers": "Best Sellers",
+    "sellWithUs": "Sell with Bastha"
+  },
+  "hero": {
+    "badge": "Limited Time Offer",
+    "title1": "Simplicity in Shopping,",
+    "title2": "Elegance in Choice.",
+    "subtitle": "Discover the best local stores and exclusive products with competitive prices and fast delivery to your door.",
+    "shopNow": "Shop Now",
+    "discoverMore": "Discover More"
+  },
+  "categories": {
+    "title": "Shop by Category",
+    "subtitle": "Choose what suits you from over 15 diverse categories",
+    "viewAll": "View All",
+    "items": {
+      "electronics": "Electronics",
+      "fashion": "Fashion",
+      "home": "Home & Furniture",
+      "health": "Health & Beauty",
+      "toys": "Toys & Kids",
+      "food": "Groceries"
+    }
+  },
+  "trending": {
+    "title": "Trending Products Now",
+    "subtitle": "Most requested by shoppers this week",
+    "reviews": "reviews",
+    "discount": "30% OFF",
+    "new": "NEW"
+  },
+  "stores": {
+    "title": "Featured Stores",
+    "subtitle": "Elite stores offering the best services and products",
+    "browseAll": "Browse All Stores",
+    "verified": "Verified Store",
+    "visit": "Visit Store"
+  },
+  "footer": {
+    "description": "Simple commerce for everyone. We connect you with the best local stores with one touch to make your shopping a pleasant and reliable experience.",
+    "quickLinks": {
+      "title": "Quick Links",
+      "about": "About Us",
+      "contact": "Contact Us",
+      "stores": "Stores",
+      "offers": "Offers & Discounts"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "help": "Help Center",
+      "faq": "FAQ"
+    },
+    "newsletter": {
+      "title": "Subscribe to our Newsletter",
+      "subtitle": "Get the latest offers and updates directly in your inbox.",
+      "placeholder": "Email Address"
+    },
+    "copyright": "© 2024 Bastha. Simple commerce for everyone."
+  },
+  "floatingButton": "Start Selling Today"
+}

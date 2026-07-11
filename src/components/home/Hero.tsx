@@ -1,9 +1,16 @@
+'use client';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
-export default function Hero() {
+export default function Hero({ dict }: { dict: any }) {
   return (
     <section className="container mx-auto px-4 md:px-8 py-8">
-      <div className="relative rounded-[2rem] overflow-hidden min-h-[500px] flex items-center bg-[#e2e8f0]">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative rounded-[2rem] overflow-hidden min-h-[500px] flex items-center bg-[#e2e8f0]"
+      >
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center z-0"
@@ -16,28 +23,52 @@ export default function Hero() {
         
         {/* Content */}
         <div className="relative z-20 max-w-2xl px-8 md:px-16 py-12 text-[#1a365d]">
-          <div className="inline-block bg-[#846b2b] text-white px-4 py-1.5 rounded-full text-sm font-bold mb-6">
-            عرض اليوم المحدود
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="inline-block bg-[#846b2b] text-white px-4 py-1.5 rounded-full text-sm font-bold mb-6"
+          >
+            {dict.hero.badge}
+          </motion.div>
           
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-[#1a365d]">
-            بساطة في التسوق،<br />رقي في الاختيار.
-          </h1>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-[#1a365d]"
+          >
+            {dict.hero.title1}<br />{dict.hero.title2}
+          </motion.h1>
           
-          <p className="text-lg md:text-xl text-[#1a365d] mb-10 font-medium">
-            اكتشف أفضل المتاجر المحلية والمنتجات الحصرية بأسعار تنافسية وتوصيل سريع حتى باب منزلك.
-          </p>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="text-lg md:text-xl text-[#1a365d] mb-10 font-medium"
+          >
+            {dict.hero.subtitle}
+          </motion.p>
           
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="#" className="bg-[#eab308] hover:bg-[#dca500] text-[#1a365d] font-extrabold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-yellow-500/20">
-              تسوق الآن
-            </Link>
-            <Link href="#" className="bg-[#8b9bb4]/40 hover:bg-[#8b9bb4]/60 backdrop-blur-md text-white font-bold px-8 py-4 rounded-xl transition-colors">
-              اكتشف المزيد
-            </Link>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="flex flex-wrap items-center gap-4"
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="#" className="bg-[#eab308] hover:bg-[#dca500] text-[#1a365d] font-extrabold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-yellow-500/20 inline-block">
+                {dict.hero.shopNow}
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="#" className="bg-[#8b9bb4]/40 hover:bg-[#8b9bb4]/60 backdrop-blur-md text-[#1a365d] md:text-white font-bold px-8 py-4 rounded-xl transition-colors inline-block">
+                {dict.hero.discoverMore}
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
