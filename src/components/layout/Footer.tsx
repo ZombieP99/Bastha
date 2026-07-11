@@ -34,10 +34,10 @@ export default function Footer({ dict, lang }: { dict: any, lang?: string }) {
           <div>
             <h3 className="text-[#1a365d] font-bold mb-6">{dict?.footer?.quickLinks?.title}</h3>
             <ul className="flex flex-col gap-3 text-sm text-gray-500">
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.about}</Link></li>
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.contact}</Link></li>
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.stores}</Link></li>
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.offers}</Link></li>
+              <li><Link href={`/${lang}#about`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.about}</Link></li>
+              <li><Link href={`/${lang}#contact`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.contact}</Link></li>
+              <li><Link href={`/${lang}/shops`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.stores}</Link></li>
+              <li><Link href={`/${lang}#offers`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.offers}</Link></li>
             </ul>
           </div>
 

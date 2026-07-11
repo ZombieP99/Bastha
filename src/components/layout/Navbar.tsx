@@ -76,11 +76,11 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
         <div className="container mx-auto px-4 md:px-8 py-3 flex items-center justify-between text-sm font-semibold">
           <nav className="flex items-center gap-6 text-gray-600">
             <Link href={`/${lang}`} className="text-[#1a365d] border-b-2 border-[#1a365d] pb-1">{dict.nav.home}</Link>
-            <Link href="#" className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.categories}</Link>
-            <Link href="#" className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.featuredStores}</Link>
-            <Link href="#" className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.bestOffers}</Link>
-            <Link href="#" className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.newArrivals}</Link>
-            <Link href="#" className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.bestSellers}</Link>
+            <Link href={`/${lang}#categories`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.categories}</Link>
+            <Link href={`/${lang}/shops`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.featuredStores}</Link>
+            <Link href={`/${lang}#offers`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.bestOffers}</Link>
+            <Link href={`/${lang}#new`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.newArrivals}</Link>
+            <Link href={`/${lang}#bestsellers`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.bestSellers}</Link>
           </nav>
           
           <div className="flex items-center gap-4">

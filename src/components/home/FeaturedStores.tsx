@@ -55,9 +55,11 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
             <h2 className="text-3xl font-extrabold text-[#1a365d] mb-2">{dict.stores.title}</h2>
             <p className="text-[#1a365d]/70 font-medium">{dict.stores.subtitle}</p>
           </div>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-white text-[#1a365d] font-bold px-6 py-3 rounded-xl shadow-sm border border-white hover:border-[#1a365d]/20 hover:shadow-md transition-all self-start">
-            {dict.stores.browseAll}
-          </motion.button>
+          <Link href={`/${lang}/shops`} className="self-start">
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-white text-[#1a365d] font-bold px-6 py-3 rounded-xl shadow-sm border border-white hover:border-[#1a365d]/20 hover:shadow-md transition-all">
+              {dict.stores.browseAll}
+            </motion.button>
+          </Link>
         </div>
 
         <motion.div 
