@@ -72,5 +72,27 @@
     },
     "copyright": "© 2024 بسطة. تجارة بسيطة للجميع."
   },
-  "floatingButton": "ابدأ البيع اليوم"
+  "floatingButton": "ابدأ البيع اليوم",
+  "shopsPage": {
+    "title": "استكشف كافة المتاجر",
+    "filters": {
+      "newest": "الأحدث",
+      "topRated": "الأعلى تقييماً",
+      "popular": "الأكثر شعبية"
+    },
+    "visitShop": "زيارة المتجر",
+    "bestSeller": "الأكثر مبيعاً",
+    "discoverMore": "اكتشف المزيد",
+    "categories": {
+      "restaurants": "مطاعم",
+      "sweets": "حلويات",
+      "beauty": "جمال",
+      "organic": "عضوي",
+      "fashion": "أزياء",
+      "leather": "جلديات",
+      "jewelry": "مجوهرات",
+      "gifts": "هدايا",
+      "sports": "رياضة"
+    }
+  }
 }

@@ -72,5 +72,27 @@
     },
     "copyright": "© 2024 Bastha. Simple commerce for everyone."
   },
-  "floatingButton": "Start Selling Today"
+  "floatingButton": "Start Selling Today",
+  "shopsPage": {
+    "title": "Explore All Shops",
+    "filters": {
+      "newest": "Newest",
+      "topRated": "Top Rated",
+      "popular": "Popular"
+    },
+    "visitShop": "Visit Shop",
+    "bestSeller": "Best Seller",
+    "discoverMore": "Discover More",
+    "categories": {
+      "restaurants": "Restaurants",
+      "sweets": "Sweets",
+      "beauty": "Beauty",
+      "organic": "Organic",
+      "fashion": "Fashion",
+      "leather": "Leather",
+      "jewelry": "Jewelry",
+      "gifts": "Gifts",
+      "sports": "Sports"
+    }
+  }
 }
