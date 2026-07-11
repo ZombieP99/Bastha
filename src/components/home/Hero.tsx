@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-export default function Hero({ dict }: { dict: any }) {
+export default function Hero({ dict, lang }: { dict: any, lang: string }) {
   return (
     <section className="container mx-auto px-4 md:px-8 py-8">
       <motion.div 
@@ -57,12 +57,12 @@ export default function Hero({ dict }: { dict: any }) {
             className="flex flex-wrap items-center gap-4"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="#" className="bg-[#eab308] hover:bg-[#dca500] text-[#1a365d] font-extrabold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-yellow-500/20 inline-block">
+              <Link href={`/${lang}/shops`} className="bg-[#eab308] hover:bg-[#dca500] text-[#1a365d] font-extrabold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-yellow-500/20 inline-block">
                 {dict.hero.shopNow}
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="#" className="bg-[#8b9bb4]/40 hover:bg-[#8b9bb4]/60 backdrop-blur-md text-[#1a365d] md:text-white font-bold px-8 py-4 rounded-xl transition-colors inline-block">
+              <Link href={`/${lang}/shops`} className="bg-[#8b9bb4]/40 hover:bg-[#8b9bb4]/60 backdrop-blur-md text-[#1a365d] md:text-white font-bold px-8 py-4 rounded-xl transition-colors inline-block">
                 {dict.hero.discoverMore}
               </Link>
             </motion.div>

@@ -15,7 +15,7 @@ export default async function Home({
 
   return (
     <>
-      <Hero dict={dict} />
+      <Hero dict={dict} lang={lang} />
       <Categories dict={dict} lang={lang} />
       <TrendingProducts dict={dict} lang={lang} />
       <FeaturedStores dict={dict} lang={lang} />

@@ -83,6 +83,9 @@
     "visitShop": "زيارة المتجر",
     "bestSeller": "الأكثر مبيعاً",
     "discoverMore": "اكتشف المزيد",
+    "searchPlaceholder": "ابحث عن المتاجر...",
+    "allCategories": "الكل",
+    "noResults": "لم يتم العثور على متاجر تطابق بحثك.",
     "categories": {
       "restaurants": "مطاعم",
       "sweets": "حلويات",

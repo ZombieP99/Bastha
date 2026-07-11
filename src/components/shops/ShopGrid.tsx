@@ -1,18 +1,23 @@
 'use client';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Store } from 'lucide-react';
 import ShopCard, { Shop } from './ShopCard';
+import ShopFilters from './ShopFilters';
 
 export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
   const isAr = lang === 'ar';
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState(dict?.shopsPage?.allCategories || 'All');
 
   const shops: Shop[] = [
     {
       id: 1,
       name: isAr ? 'بيت المخبوزات' : 'Bakery House',
       description: isAr ? 'مخبوزات طازجة يومياً' : 'Freshly baked goods daily',
-      coverImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/bakery/800/600',
+      logo: 'https://picsum.photos/seed/bakerylogo/200/200',
       rating: 4.7,
       tags: [dict?.shopsPage?.categories?.restaurants, dict?.shopsPage?.categories?.sweets]
     },
@@ -20,8 +25,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 2,
       name: isAr ? 'نبع الطبيعة' : 'Nature Spring',
       description: isAr ? 'عناية بالبشرة طبيعية' : 'Natural skincare products',
-      coverImage: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/nature/800/600',
+      logo: 'https://picsum.photos/seed/naturelogo/200/200',
       rating: 4.5,
       tags: [dict?.shopsPage?.categories?.beauty, dict?.shopsPage?.categories?.organic]
     },
@@ -29,8 +34,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 3,
       name: isAr ? 'تراث الجلود' : 'Leather Heritage',
       description: isAr ? 'صناعة يدوية فاخرة' : 'Luxury handmade leather goods',
-      coverImage: 'https://images.unsplash.com/photo-1548863227-3af567fc3b27?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1590845947698-8924d7409b56?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/leather/800/600',
+      logo: 'https://picsum.photos/seed/leatherlogo/200/200',
       rating: 4.9,
       tags: [dict?.shopsPage?.categories?.fashion, dict?.shopsPage?.categories?.leather]
     },
@@ -38,8 +43,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 4,
       name: isAr ? 'زمرد للمجوهرات' : 'Emerald Jewelry',
       description: isAr ? 'أناقة وأحجار كريمة' : 'Elegance and precious stones',
-      coverImage: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/jewelry/800/600',
+      logo: 'https://picsum.photos/seed/jewelrylogo/200/200',
       rating: 4.8,
       tags: [dict?.shopsPage?.categories?.jewelry, dict?.shopsPage?.categories?.gifts]
     },
@@ -47,8 +52,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 5,
       name: isAr ? 'نشاط ورياضة' : 'Active & Sports',
       description: isAr ? 'ملابس رياضية وأدوات' : 'Sportswear and equipment',
-      coverImage: 'https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/sports/800/600',
+      logo: 'https://picsum.photos/seed/sportslogo/200/200',
       rating: 4.4,
       tags: [dict?.shopsPage?.categories?.fashion, dict?.shopsPage?.categories?.sports]
     },
@@ -56,8 +61,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 6,
       name: isAr ? 'عالم التقنية' : 'Tech Oasis',
       description: isAr ? 'أحدث الأجهزة الذكية' : 'Latest smart devices',
-      coverImage: 'https://images.unsplash.com/photo-1531297172867-4d6537f05218?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1550009158-9ebf6d250400?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/tech/800/600',
+      logo: 'https://picsum.photos/seed/techlogo/200/200',
       rating: 4.6,
       tags: [dict?.categories?.items?.electronics]
     },
@@ -65,8 +70,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 7,
       name: isAr ? 'واحة القارئ' : 'Readers Oasis',
       description: isAr ? 'كتب وروايات متنوعة' : 'Books and diverse novels',
-      coverImage: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/books/800/600',
+      logo: 'https://picsum.photos/seed/bookslogo/200/200',
       rating: 4.9,
       tags: [dict?.categories?.items?.toys]
     },
@@ -74,12 +79,27 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
       id: 8,
       name: isAr ? 'ألعاب الفرح' : 'Joy Toys',
       description: isAr ? 'ألعاب أطفال آمنة' : 'Safe kids toys',
-      coverImage: 'https://images.unsplash.com/photo-1558066160-58c9735d4872?q=80&w=800&auto=format&fit=crop',
-      logo: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=200&auto=format&fit=crop',
+      coverImage: 'https://picsum.photos/seed/toys/800/600',
+      logo: 'https://picsum.photos/seed/toyslogo/200/200',
       rating: 4.8,
       tags: [dict?.categories?.items?.toys, dict?.shopsPage?.categories?.gifts]
     }
   ];
+
+  // Derive filtered shops
+  const filteredShops = useMemo(() => {
+    return shops.filter((shop) => {
+      // Search match
+      const matchesSearch = shop.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            shop.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Category match
+      const isAllCategories = activeCategory === dict?.shopsPage?.allCategories || !activeCategory;
+      const matchesCategory = isAllCategories || shop.tags.includes(activeCategory);
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [shops, searchQuery, activeCategory, dict]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,8 +112,8 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
   return (
     <section className="container mx-auto px-4 md:px-8 py-8 md:py-12">
       
-      {/* Header and Filter */}
-      <div className={`flex flex-col md:flex-row items-center justify-between gap-4 mb-10 ${isAr ? 'md:flex-row-reverse' : ''}`}>
+      {/* Title & Dropdown Header */}
+      <div className={`flex flex-col md:flex-row items-center justify-between gap-4 mb-8 ${isAr ? 'md:flex-row-reverse' : ''}`}>
         <h2 className="text-3xl font-extrabold text-[#1a365d]">
           {dict?.shopsPage?.title}
         </h2>
@@ -107,18 +127,34 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
         </div>
       </div>
 
+      {/* Search & Category Filters */}
+      <ShopFilters 
+        dict={dict} 
+        lang={lang} 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
+
       {/* Grid */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: "-50px" }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        {shops.map((shop) => (
-          <ShopCard key={shop.id} shop={shop} dict={dict} lang={lang} />
-        ))}
-      </motion.div>
+      {filteredShops.length > 0 ? (
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {filteredShops.map((shop) => (
+            <ShopCard key={shop.id} shop={shop} dict={dict} lang={lang} />
+          ))}
+        </motion.div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+          <Store className="w-16 h-16 mb-4 text-gray-300" />
+          <h3 className="text-xl font-bold text-[#1a365d] mb-2">{dict?.shopsPage?.noResults}</h3>
+        </div>
+      )}
       
     </section>
   );

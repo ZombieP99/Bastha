@@ -14,6 +14,20 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
     router.push(newPathname || `/${newLang}`);
   };
 
+  const isActive = (path: string) => {
+    if (path === `/${lang}`) {
+      return pathname === `/${lang}`;
+    }
+    // Simple check to avoid highlighting home when on /shops
+    return pathname.startsWith(path);
+  };
+
+  const getLinkClass = (path: string) => {
+    return isActive(path)
+      ? "text-[#1a365d] border-b-2 border-[#1a365d] pb-1 font-bold"
+      : "hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]";
+  };
+
   return (
     <header className="w-full bg-white shadow-sm sticky top-0 z-50">
       {/* Top Header */}
@@ -75,12 +89,12 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
       <div className="bg-[#f8fafc] border-t border-gray-100 hidden md:block">
         <div className="container mx-auto px-4 md:px-8 py-3 flex items-center justify-between text-sm font-semibold">
           <nav className="flex items-center gap-6 text-gray-600">
-            <Link href={`/${lang}`} className="text-[#1a365d] border-b-2 border-[#1a365d] pb-1">{dict.nav.home}</Link>
-            <Link href={`/${lang}#categories`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.categories}</Link>
-            <Link href={`/${lang}/shops`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.featuredStores}</Link>
-            <Link href={`/${lang}#offers`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.bestOffers}</Link>
-            <Link href={`/${lang}#new`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.newArrivals}</Link>
-            <Link href={`/${lang}#bestsellers`} className="hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]">{dict.nav.bestSellers}</Link>
+            <Link href={`/${lang}`} className={getLinkClass(`/${lang}`)}>{dict.nav.home}</Link>
+            <Link href={`/${lang}#categories`} className={getLinkClass(`/${lang}#categories`)}>{dict.nav.categories}</Link>
+            <Link href={`/${lang}/shops`} className={getLinkClass(`/${lang}/shops`)}>{dict.nav.featuredStores}</Link>
+            <Link href={`/${lang}#offers`} className={getLinkClass(`/${lang}#offers`)}>{dict.nav.bestOffers}</Link>
+            <Link href={`/${lang}#new`} className={getLinkClass(`/${lang}#new`)}>{dict.nav.newArrivals}</Link>
+            <Link href={`/${lang}#bestsellers`} className={getLinkClass(`/${lang}#bestsellers`)}>{dict.nav.bestSellers}</Link>
           </nav>
           
           <div className="flex items-center gap-4">

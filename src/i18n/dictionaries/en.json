@@ -83,6 +83,9 @@
     "visitShop": "Visit Shop",
     "bestSeller": "Best Seller",
     "discoverMore": "Discover More",
+    "searchPlaceholder": "Search shops...",
+    "allCategories": "All",
+    "noResults": "No shops found matching your search.",
     "categories": {
       "restaurants": "Restaurants",
       "sweets": "Sweets",

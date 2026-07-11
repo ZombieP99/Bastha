@@ -18,7 +18,7 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
           className="lg:col-span-2 relative rounded-3xl overflow-hidden min-h-[400px] flex items-end group"
         >
           <img 
-            src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1200&auto=format&fit=crop" 
+            src="https://picsum.photos/seed/perfume/1200/800" 
             alt="Perfume Store" 
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
@@ -36,7 +36,7 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
                  {isAr ? 'أرقى العطور المستوحاة من الطبيعة الخلابة' : 'The finest perfumes inspired by stunning nature'}
                </p>
                
-               <Link href="#">
+               <Link href={`/${lang}/shops`}>
                  <motion.button 
                    whileHover={{ scale: 1.05 }}
                    whileTap={{ scale: 0.95 }}
@@ -60,7 +60,7 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] flex items-end group"
           >
             <img 
-              src="https://images.unsplash.com/photo-1542340916-38297071c312?q=80&w=800&auto=format&fit=crop" 
+              src="https://picsum.photos/seed/decor/800/600" 
               alt="Home Decor" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
@@ -68,7 +68,7 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             <div className={`relative z-10 p-6 w-full text-white ${isAr ? 'text-right' : 'text-left'}`}>
                <h3 className="text-2xl font-bold mb-1">{isAr ? 'لمسات دافئة' : 'Warm Touches'}</h3>
                <p className="text-white/70 text-sm mb-3">{isAr ? 'ديكورات منزلية بأسلوب حديث' : 'Modern style home decor'}</p>
-               <Link href="#" className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link">
+               <Link href={`/${lang}/shops`} className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link">
                  {dict?.shopsPage?.discoverMore}
                  {isAr ? <ArrowLeft className="w-4 h-4 group-hover/link:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />}
                </Link>
@@ -82,7 +82,7 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] flex items-end group"
           >
             <img 
-              src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=800&auto=format&fit=crop" 
+              src="https://picsum.photos/seed/watches/800/600" 
               alt="Watches" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
@@ -90,7 +90,7 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             <div className={`relative z-10 p-6 w-full text-white ${isAr ? 'text-right' : 'text-left'}`}>
                <h3 className="text-2xl font-bold mb-1">{isAr ? 'وقت وفن' : 'Time & Art'}</h3>
                <p className="text-white/70 text-sm mb-3">{isAr ? 'تشكيلة واسعة من الساعات الفاخرة' : 'A wide selection of luxury watches'}</p>
-               <Link href="#" className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link">
+               <Link href={`/${lang}/shops`} className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link">
                  {dict?.shopsPage?.discoverMore}
                  {isAr ? <ArrowLeft className="w-4 h-4 group-hover/link:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />}
                </Link>

@@ -44,7 +44,7 @@ export default function Categories({ dict, lang }: { dict: any, lang: string }) 
           <h2 className="text-3xl font-extrabold text-[#1a365d] mb-2">{dict.categories.title}</h2>
           <p className="text-gray-500">{dict.categories.subtitle}</p>
         </div>
-        <Link href="#" className="flex items-center gap-2 text-[#1a365d] font-bold hover:text-blue-700 transition group">
+        <Link href={`/${lang}/shops`} className="flex items-center gap-2 text-[#1a365d] font-bold hover:text-blue-700 transition group">
           {dict.categories.viewAll}
           {lang === 'ar' ? (
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
