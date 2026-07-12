@@ -123,7 +123,7 @@ Once you see the success message in your terminal, open your favorite web browse
 قبل البدء، تأكد من تثبيت البرامج التالية على جهازك:
 1. **[Node.js](https://nodejs.org/en/)**: (الإصدار 18 فما فوق). قم بتحميله وتثبيته من الموقع الرسمي.
 2. **محرر أكواد**: ينصح باستخدام [VS Code](https://code.visualstudio.com/).
-3. **Git**: (اختياري) لنسخ المشروع باستخدام سطر الأوامر.
+3. **Git**: لنسخ المشروع باستخدام سطر الأوامر.
 
 #### الخطوة 2: تنزيل المشروع (Download)
 يمكنك الحصول على ملفات المشروع بإحدى الطريقتين:
@@ -131,7 +131,7 @@ Once you see the success message in your terminal, open your favorite web browse
 **الطريقة الأولى: باستخدام Git (مستحسن)**
 افتح سطر الأوامر (Terminal) واكتب الأمر التالي:
 ```bash
-git clone <رابط-مستودع-المشروع>
+git clone https://github.com/ZombieP99/Bastha
 ```
 
 **الطريقة الثانية: كملف مضغوط (ZIP)**
