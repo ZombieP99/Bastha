@@ -1,95 +1,129 @@
-# Bastha | بسطة
+<div align="center">
+  <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200&auto=format&fit=crop" alt="Bastha Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
 
-[English](#english) | [العربية](#العربية)
+  <h1>🛍️ Bastha | بسطة</h1>
+  <p><strong>A Modern Next.js Platform for Local Shop Discovery</strong></p>
+
+  <p>
+    <a href="#english"><img src="https://img.shields.io/badge/Language-English-blue?style=for-the-badge&logo=googletranslate" alt="English" /></a>
+    <a href="#arabic"><img src="https://img.shields.io/badge/اللغة-العربية-1a365d?style=for-the-badge&logo=googletranslate" alt="Arabic" /></a>
+  </p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Next.js-14+-black?style=flat-square&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
+    <img src="https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+    <img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  </p>
+</div>
 
 ---
 
 <a id="english"></a>
 ## 🇬🇧 English
 
-**Bastha** is a modern local shop discovery platform built with Next.js. It aims to connect users with the best local stores, offering a seamless and beautiful browsing experience with full bilingual support (English and Arabic).
+Welcome to **Bastha** (بسطة)! Bastha is a premium, beautifully designed e-commerce and local shop discovery platform. It aims to connect users with the best local stores, offering a seamless browsing experience with full bilingual support.
 
-### ✨ Features
-- **Bilingual Interface**: Full i18n support for English and Arabic.
-- **RTL Support**: Automatic layout switching for Right-to-Left Arabic text.
-- **Modern UI/UX**: Built with Tailwind CSS and Framer Motion for smooth animations and responsive design.
-- **Dynamic Shop Directory**: Browse, search, and filter through various local shops and categories.
-- **Optimized Performance**: Powered by Next.js App Router and Turbopack for blazing-fast load times.
+### ✨ Key Features
 
-### 🛠️ Tech Stack
-- **Framework**: [Next.js](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Language**: TypeScript
+| Feature | Description |
+|---------|-------------|
+| 🌍 **Bilingual Interface** | Full i18n support offering content in both English and Arabic. |
+| 🔄 **RTL Architecture** | Automatic layout flipping and tailored typography for Right-to-Left languages. |
+| 🎨 **Premium UI/UX** | Built with Tailwind CSS and Framer Motion for buttery-smooth animations. |
+| 🔎 **Dynamic Discovery** | Real-time search and category filtering for shops and stores. |
+| 🚀 **High Performance** | Powered by Next.js App Router and Turbopack for instantaneous load times. |
 
-### 🚀 Getting Started
+### 📸 Gallery
 
-#### Prerequisites
-- Node.js (v18 or higher)
+<div align="center">
+  <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=500&auto=format&fit=crop" width="48%" style="border-radius: 8px;" />
+  <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=500&auto=format&fit=crop" width="48%" style="border-radius: 8px;" />
+</div>
+
+<br>
+
+### 🛠️ Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine.
+
+**1. Prerequisites**
+Ensure you have the following installed:
+- Node.js (v18.0.0 or higher)
 - npm, yarn, or pnpm
 
-#### Installation
+**2. Installation**
+```bash
+# Navigate to the project folder
+cd projact
 
-1. Navigate to the project directory:
-   ```bash
-   cd projact
-   ```
+# Install all necessary dependencies
+npm install
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+**3. Running the Server**
+```bash
+# Start the local development server
+npm run dev
+```
+Navigate to `http://localhost:3000` in your favorite browser to view the application!
 
 ---
 
-<a id="العربية"></a>
+<a id="arabic"></a>
 ## 🇸🇦 العربية (Arabic)
 
-**بسطة (Bastha)** هي منصة حديثة لاكتشاف المتاجر المحلية مبنية باستخدام Next.js. تهدف المنصة إلى ربط المستخدمين بأفضل المتاجر المحلية، وتوفير تجربة تصفح سلسة وجميلة مع دعم كامل للغتين (الإنجليزية والعربية).
+<div align="right" dir="rtl">
 
-### ✨ المميزات
-- **واجهة ثنائية اللغة**: دعم كامل للترجمة (i18n) باللغتين الإنجليزية والعربية.
-- **دعم الاتجاه من اليمين لليسار (RTL)**: تغيير تلقائي لتخطيط الصفحة ليتناسب مع اللغة العربية بشكل طبيعي.
-- **تصميم عصري ومتجاوب (UI/UX)**: واجهة مستخدم مبنية باستخدام Tailwind CSS و Framer Motion لتقديم حركات سلسة وتجربة مستخدم مذهلة.
-- **دليل المتاجر الديناميكي**: إمكانية تصفح، وبحث، وفلترة المتاجر المحلية عبر مختلف الفئات.
-- **أداء مُحسّن**: يعتمد المشروع على Next.js App Router و Turbopack لضمان سرعة تحميل فائقة.
+أهلاً بك في **بسطة (Bastha)**! منصة متطورة مصممة بأحدث التقنيات لاكتشاف المتاجر المحلية. تهدف المنصة إلى ربط المستخدمين بأفضل المتاجر بأسلوب عصري، مع توفير تجربة تصفح سلسة وجميلة بدعم كامل للغتين الإنجليزية والعربية.
 
-### 🛠️ التقنيات المستخدمة
-- **إطار العمل**: [Next.js](https://nextjs.org/) (App Router)
-- **التصميم**: [Tailwind CSS](https://tailwindcss.com/)
-- **الحركات**: [Framer Motion](https://www.framer.com/motion/)
-- **الأيقونات**: [Lucide React](https://lucide.dev/)
-- **لغة البرمجة**: TypeScript
+### ✨ المميزات الرئيسية
 
-### 🚀 طريقة التشغيل
+| الميزة | الوصف |
+|---------|-------------|
+| 🌍 **واجهة ثنائية اللغة** | دعم كامل للترجمة (i18n) باللغتين الإنجليزية والعربية لتجربة مستخدم مخصصة. |
+| 🔄 **تخطيط RTL مثالي** | تغيير تلقائي لاتجاه وتخطيط الصفحة ليتناسب مع اللغة العربية بشكل طبيعي واحترافي. |
+| 🎨 **تصميم عصري (UI/UX)** | واجهة مستخدم مبنية باستخدام Tailwind CSS و Framer Motion لحركات ناعمة وتصميم متجاوب. |
+| 🔎 **اكتشاف ديناميكي** | محرك بحث ذكي وفلاتر لحظية لتصنيفات المتاجر. |
+| 🚀 **أداء فائق السرعة** | يعتمد المشروع على تقنيات Next.js App Router و Turbopack لضمان سرعة استجابة مذهلة. |
 
-#### المتطلبات المسبقة
+### 📸 لقطات من النظام
+
+<div align="center">
+  <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=500&auto=format&fit=crop" width="48%" style="border-radius: 8px;" />
+  <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=500&auto=format&fit=crop" width="48%" style="border-radius: 8px;" />
+</div>
+
+<br>
+
+### 🛠️ طريقة التشغيل والاستخدام
+
+اتبع هذه الخطوات لتشغيل المشروع محلياً على جهازك.
+
+**1. المتطلبات المسبقة**
+تأكد من تنصيب البرامج التالية:
 - Node.js (الإصدار 18 أو أحدث)
-- حزمة Node Package Manager (مثل npm أو yarn)
+- مدير حزم مثل npm أو yarn
 
-#### خطوات التثبيت والتشغيل
+**2. تثبيت الحزم**
+```bash
+# الانتقال لمجلد المشروع
+cd projact
 
-1. افتح موجه الأوامر (Terminal) وانتقل إلى مجلد المشروع:
-   ```bash
-   cd projact
-   ```
+# تثبيت جميع الاعتمادات والحزم البرمجية
+npm install
+```
 
-2. قم بتثبيت الحزم والاعتمادات البرمجية:
-   ```bash
-   npm install
-   ```
+**3. تشغيل خادم التطوير**
+```bash
+# تشغيل خادم التطوير المحلي
+npm run dev
+```
+قم بزيارة الرابط `http://localhost:3000` في متصفحك للاستمتاع بتجربة الموقع!
 
-3. قم بتشغيل خادم التطوير المحلي:
-   ```bash
-   npm run dev
-   ```
+</div>
 
-4. افتح الرابط [http://localhost:3000](http://localhost:3000) في متصفحك لرؤية الموقع والتفاعل معه.
+---
+<div align="center">
+  <p>Built with ❤️ using Next.js & TailwindCSS</p>
+</div>
