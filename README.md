@@ -53,10 +53,10 @@ Before you begin, ensure you have the following tools installed:
 #### Step 2: Download the Project
 You can download the project files in one of two ways:
 
-**Method 1: Using Git (Recommended)**
+**Method 1: Using Git**
 Open your Terminal or Command Prompt and run the following command:
 ```bash
-git clone <repository-url>
+git clone https://github.com/ZombieP99/Bastha
 ```
 
 **Method 2: As a ZIP File**
