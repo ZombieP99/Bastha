@@ -38,8 +38,8 @@ export default async function RootLayout({
   const fontClass = lang === 'ar' ? `${tajawal.variable} font-tajawal` : `${inter.variable} font-inter`;
 
   return (
-    <html lang={lang} dir={dir} className={`${fontClass} antialiased h-full`}>
-      <body className="min-h-full flex flex-col bg-[#f0f4f8] text-[#1a365d]">
+    <html lang={lang} dir={dir} className={`${fontClass} antialiased h-full`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-[#f0f4f8] text-[#1a365d]" suppressHydrationWarning>
         <Navbar dict={dict} lang={lang} />
         <main className="flex-1">
           {children}
