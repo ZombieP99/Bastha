@@ -6,7 +6,7 @@
 
   <p>
     <a href="#english"><img src="https://img.shields.io/badge/Language-English-blue?style=for-the-badge&logo=googletranslate" alt="English" /></a>
-    <a href="#arabic"><img src="https://img.shields.io/badge/اللغة-العربية-1a365d?style=for-the-badge&logo=googletranslate" alt="Arabic" /></a>
+    <a href="#arabic"><img src="https://img.shields.io/badge/Language-Arabic-1a365d?style=for-the-badge&logo=googletranslate" alt="Arabic" /></a>
   </p>
   
   <p>
