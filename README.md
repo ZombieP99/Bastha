@@ -40,30 +40,52 @@ Welcome to **Bastha** (بسطة)! Bastha is a premium, beautifully designed e-co
 
 <br>
 
-### 🛠️ Getting Started
+### 🛠️ Detailed Setup & Installation Guide
 
-Follow these instructions to get a copy of the project up and running on your local machine.
+Follow these precise steps to download, install, and run the project locally on your machine.
 
-**1. Prerequisites**
-Ensure you have the following installed:
-- Node.js (v18.0.0 or higher)
-- npm, yarn, or pnpm
+#### Step 1: Prerequisites
+Before you begin, ensure you have the following tools installed:
+1. **[Node.js](https://nodejs.org/en/)**: (Version 18 or higher). Download and install it from the official website.
+2. **Code Editor**: We highly recommend [VS Code](https://code.visualstudio.com/).
+3. **Git**: (Optional) For cloning the repository via the command line.
 
-**2. Installation**
+#### Step 2: Download the Project
+You can download the project files in one of two ways:
+
+**Method 1: Using Git (Recommended)**
+Open your Terminal or Command Prompt and run the following command:
 ```bash
-# Navigate to the project folder
+git clone <repository-url>
+```
+
+**Method 2: As a ZIP File**
+- Click the green **"Code"** button at the top of this GitHub page.
+- Select **"Download ZIP"**.
+- Once downloaded, extract (unzip) the folder anywhere on your computer.
+
+#### Step 3: Install Dependencies
+Open the extracted project folder in your terminal (or inside VS Code's integrated terminal), and run the following commands:
+
+```bash
+# 1. Navigate into the project directory
 cd projact
 
-# Install all necessary dependencies
+# 2. Install all required packages and dependencies
 npm install
 ```
+*(Note: This process might take a few minutes depending on your internet connection).*
 
-**3. Running the Server**
+#### Step 4: Run the Application
+Everything is set up! To start the local development server, run:
+
 ```bash
-# Start the local development server
+# Start the development server
 npm run dev
 ```
-Navigate to `http://localhost:3000` in your favorite browser to view the application!
+
+Once you see the success message in your terminal, open your favorite web browser and visit:
+👉 **[http://localhost:3000](http://localhost:3000)**
 
 ---
 
