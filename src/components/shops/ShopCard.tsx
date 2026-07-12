@@ -54,7 +54,7 @@ export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: any; 
 
         {/* Visit Button */}
         <div className="mt-auto pt-4 border-t border-gray-50">
-          <Link href="#" className="block w-full">
+          <Link href={`/${lang}/shops/${shop.id}`} className="block w-full">
             <motion.button 
               whileHover={{ scale: 1.02 }} 
               whileTap={{ scale: 0.98 }} 

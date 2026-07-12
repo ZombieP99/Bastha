@@ -86,6 +86,16 @@
     "searchPlaceholder": "ابحث عن المتاجر...",
     "allCategories": "الكل",
     "noResults": "لم يتم العثور على متاجر تطابق بحثك.",
+    "shopDetails": {
+      "overview": "نظرة عامة",
+      "products": "المنتجات",
+      "reviews": "التقييمات",
+      "addToCart": "أضف للسلة",
+      "price": "السعر",
+      "currency": "ر.س",
+      "outOfStock": "نفذت الكمية",
+      "searchProducts": "ابحث عن المنتجات..."
+    },
     "categories": {
       "restaurants": "مطاعم",
       "sweets": "حلويات",

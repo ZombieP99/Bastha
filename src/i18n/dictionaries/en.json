@@ -86,6 +86,16 @@
     "searchPlaceholder": "Search shops...",
     "allCategories": "All",
     "noResults": "No shops found matching your search.",
+    "shopDetails": {
+      "overview": "Overview",
+      "products": "Products",
+      "reviews": "Reviews",
+      "addToCart": "Add to Cart",
+      "price": "Price",
+      "currency": "SAR",
+      "outOfStock": "Out of Stock",
+      "searchProducts": "Search products..."
+    },
     "categories": {
       "restaurants": "Restaurants",
       "sweets": "Sweets",
