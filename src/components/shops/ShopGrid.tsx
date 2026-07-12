@@ -171,7 +171,7 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
     <section className="container mx-auto px-4 md:px-8 py-8 md:py-12">
       
       {/* Title & Dropdown Header */}
-      <div className={`flex flex-col md:flex-row items-center justify-between gap-4 mb-8 ${isAr ? 'md:flex-row-reverse' : ''}`}>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
         <h2 className="text-3xl font-extrabold text-[#1a365d]">
           {dict?.shopsPage?.title}
         </h2>
@@ -180,9 +180,9 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
         <div className="relative" ref={dropdownRef}>
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className={`flex items-center gap-2 bg-[#f0f4f8] text-[#1a365d] px-5 py-2.5 rounded-xl font-bold border border-transparent hover:border-gray-200 transition-colors ${isAr ? 'flex-row-reverse' : 'flex-row'}`}
+            className="flex items-center gap-2 bg-[#f0f4f8] text-[#1a365d] px-5 py-2.5 rounded-xl font-bold border border-transparent hover:border-gray-200 transition-colors"
           >
-            <div className={`flex items-center gap-2 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
+            <div className="flex items-center gap-2">
               {getSortIcon(sortOrder)}
               <span>{getSortLabel(sortOrder)}</span>
             </div>
@@ -208,9 +208,9 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
                         setSortOrder(option);
                         setIsDropdownOpen(false);
                       }}
-                      className={`w-full px-5 py-3 text-sm font-bold transition-colors flex items-center gap-3 ${
-                        isAr ? 'flex-row-reverse text-right' : 'flex-row text-left'
-                      } ${sortOrder === option ? 'bg-[#1a365d]/5 text-[#1a365d]' : 'text-gray-600 hover:bg-gray-50'}`}
+                      className={`w-full px-5 py-3 text-sm font-bold transition-colors flex items-center gap-3 text-start ${
+                        sortOrder === option ? 'bg-[#1a365d]/5 text-[#1a365d]' : 'text-gray-600 hover:bg-gray-50'
+                      }`}
                     >
                       {getSortIcon(option)}
                       <span>{getSortLabel(option)}</span>
