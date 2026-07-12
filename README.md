@@ -121,6 +121,3 @@ npm run dev
 </div>
 
 ---
-<div align="center">
-  <p>Built with ❤️ using Next.js & TailwindCSS</p>
-</div>
