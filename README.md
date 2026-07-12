@@ -1,6 +1,3 @@
-<div align="center">
-  <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200&auto=format&fit=crop" alt="Bastha Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
-
   <h1>🛍️ Bastha | بسطة</h1>
   <p><strong>A Modern Next.js Platform for Local Shop Discovery</strong></p>
 
