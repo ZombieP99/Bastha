@@ -107,5 +107,35 @@
       "gifts": "Gifts",
       "sports": "Sports"
     }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "welcomeBack": "Welcome Back!",
+    "welcomeBackDesc": "Please login to access your account",
+    "joinUs": "Welcome to Bastha",
+    "joinUsDesc": "Join us today and start your business journey with ease",
+    "accountType": "Account Type",
+    "customer": "Customer",
+    "merchant": "Merchant",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email Address",
+    "emailPlaceholder": "example@mail.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "terms": "I agree to the Terms of Service and Privacy Policy.",
+    "createAccount": "Create Account",
+    "orContinueWith": "Or continue with",
+    "google": "Google",
+    "facebook": "Facebook",
+    "noAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "forgotPassword": "Forgot Password?",
+    "sideTitle": "Bastha makes commerce easier",
+    "sideDesc": "We are here to connect you with the best stores or to help you showcase your products to the world simply and smoothly.",
+    "feature1": "Reliable",
+    "feature2": "Fast",
+    "feature3": "Support"
   }
 }

@@ -64,14 +64,14 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
           </button>
           
           <div className="hidden sm:flex items-center gap-4 text-sm font-medium">
-            <Link href="#" className="text-[#1a365d] hover:text-blue-700 transition">
+            <Link href={`/${lang}/auth?mode=login`} className="text-[#1a365d] hover:text-blue-700 transition">
               {dict.common.login}
             </Link>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="#" className="bg-[#2b4c7e] text-white px-5 py-2.5 rounded-lg hover:bg-[#1a365d] transition">
+            <Link href={`/${lang}/auth?mode=signup`}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-[#2b4c7e] text-white px-5 py-2.5 rounded-lg hover:bg-[#1a365d] transition cursor-pointer">
                 {dict.common.register}
-              </Link>
-            </motion.div>
+              </motion.div>
+            </Link>
           </div>
           
           <Link href="#" className="relative flex items-center group">
