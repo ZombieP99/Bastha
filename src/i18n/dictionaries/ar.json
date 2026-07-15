@@ -137,5 +137,35 @@
     "feature1": "موثوق",
     "feature2": "سريع",
     "feature3": "دعم فني"
+  },
+  "newArrivals": {
+    "title": "وصل حديثاً",
+    "subtitle": "اكتشف أحدث المنتجات المضافة في متاجرنا."
+  },
+  "product": {
+    "details": "تفاصيل المنتج",
+    "comparePrices": "مقارنة الأسعار",
+    "availableStores": "المتاجر المتوفرة",
+    "reviews": "التقييمات والمراجعات",
+    "addToCart": "أضف إلى السلة",
+    "outOfStock": "نفدت الكمية",
+    "description": "الوصف",
+    "specifications": "المواصفات",
+    "seller": "البائع"
+  },
+  "search": {
+    "resultsFor": "نتائج البحث عن",
+    "noResults": "لم يتم العثور على نتائج.",
+    "filters": "تصفية النتائج",
+    "categories": "الفئات",
+    "priceRange": "السعر",
+    "rating": "التقييم",
+    "sort": "ترتيب حسب",
+    "sortNewest": "الأحدث",
+    "sortPriceLowHigh": "السعر: من الأقل للأعلى",
+    "sortPriceHighLow": "السعر: من الأعلى للأقل",
+    "sortRating": "الأعلى تقييماً",
+    "applyFilters": "تطبيق التصفية",
+    "clearFilters": "مسح التصفية"
   }
 }

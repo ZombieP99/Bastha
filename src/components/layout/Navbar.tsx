@@ -1,12 +1,21 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, ShoppingCart, ShoppingBag, Globe } from 'lucide-react';
+import { Search, ShoppingCart, ShoppingBag, Globe, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/${lang}/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   const toggleLanguage = () => {
     const newLang = lang === 'ar' ? 'en' : 'ar';
@@ -43,24 +52,37 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
             </h1>
           </Link>
 
-          <div className="hidden md:flex flex-1 max-w-xl relative group">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl relative group">
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={dict.common.searchPlaceholder}
-              className={`w-full bg-[#f0f4f8] text-sm rounded-full py-2.5 px-4 outline-none border border-transparent focus:border-[#1a365d] transition-colors ${lang === 'ar' ? 'pr-10' : 'pl-10'}`}
+              className={`w-full bg-[#f0f4f8] text-sm rounded-full py-2.5 px-10 outline-none border border-transparent focus:border-[#1a365d] transition-colors`}
             />
-            <Search className={`w-4 h-4 text-gray-500 absolute top-1/2 -translate-y-1/2 group-focus-within:text-[#1a365d] transition-colors ${lang === 'ar' ? 'left-4' : 'right-4'}`} />
-          </div>
+            <button type="submit" className={`absolute top-1/2 -translate-y-1/2 ${lang === 'ar' ? 'right-4' : 'left-4'}`}>
+              <Search className="w-4 h-4 text-gray-500 group-focus-within:text-[#1a365d] transition-colors" />
+            </button>
+            {searchQuery && (
+              <button 
+                type="button" 
+                onClick={() => setSearchQuery('')}
+                className={`absolute top-1/2 -translate-y-1/2 ${lang === 'ar' ? 'left-4' : 'right-4'}`}
+              >
+                <X className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors" />
+              </button>
+            )}
+          </form>
         </div>
 
         {/* Left side: Auth & Cart */}
         <div className="flex items-center gap-4 md:gap-6">
           <button 
             onClick={toggleLanguage}
-            className="flex items-center gap-1 text-[#1a365d] hover:text-blue-700 font-medium text-sm transition"
+            className="flex items-center gap-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-[#1a365d] px-3 py-1.5 rounded-full font-bold text-xs transition"
           >
-            <Globe className="w-4 h-4" />
-            {lang === 'ar' ? 'EN' : 'عربي'}
+            <Globe className="w-3.5 h-3.5" />
+            {lang === 'ar' ? 'English' : 'عربي'}
           </button>
           
           <div className="hidden sm:flex items-center gap-4 text-sm font-medium">
@@ -90,11 +112,8 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
         <div className="container mx-auto px-4 md:px-8 py-3 flex items-center justify-between text-sm font-semibold">
           <nav className="flex items-center gap-6 text-gray-600">
             <Link href={`/${lang}`} className={getLinkClass(`/${lang}`)}>{dict.nav.home}</Link>
-            <Link href={`/${lang}#categories`} className={getLinkClass(`/${lang}#categories`)}>{dict.nav.categories}</Link>
+            <Link href={`/${lang}/search`} className={getLinkClass(`/${lang}/search`)}>{lang === 'ar' ? 'المنتجات' : 'Products'}</Link>
             <Link href={`/${lang}/shops`} className={getLinkClass(`/${lang}/shops`)}>{dict.nav.featuredStores}</Link>
-            <Link href={`/${lang}#offers`} className={getLinkClass(`/${lang}#offers`)}>{dict.nav.bestOffers}</Link>
-            <Link href={`/${lang}#new`} className={getLinkClass(`/${lang}#new`)}>{dict.nav.newArrivals}</Link>
-            <Link href={`/${lang}#bestsellers`} className={getLinkClass(`/${lang}#bestsellers`)}>{dict.nav.bestSellers}</Link>
           </nav>
           
           <div className="flex items-center gap-4">

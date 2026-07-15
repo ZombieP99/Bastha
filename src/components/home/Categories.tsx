@@ -14,12 +14,12 @@ import {
 
 export default function Categories({ dict, lang }: { dict: any, lang: string }) {
   const categories = [
-    { id: 1, name: dict.categories.items.electronics, icon: MonitorSmartphone },
-    { id: 2, name: dict.categories.items.fashion, icon: Shirt },
-    { id: 3, name: dict.categories.items.home, icon: Armchair },
-    { id: 4, name: dict.categories.items.health, icon: ShieldPlus },
-    { id: 5, name: dict.categories.items.toys, icon: Baby },
-    { id: 6, name: dict.categories.items.food, icon: Utensils },
+    { id: 1, name: dict.categories.items.electronics, icon: MonitorSmartphone, value: 'electronics' },
+    { id: 2, name: dict.categories.items.fashion, icon: Shirt, value: 'fashion' },
+    { id: 3, name: dict.categories.items.home, icon: Armchair, value: 'home' },
+    { id: 4, name: dict.categories.items.health, icon: ShieldPlus, value: 'health' },
+    { id: 5, name: dict.categories.items.toys, icon: Baby, value: 'toys' },
+    { id: 6, name: dict.categories.items.food, icon: Utensils, value: 'food' },
   ];
 
   const containerVariants = {
@@ -44,7 +44,7 @@ export default function Categories({ dict, lang }: { dict: any, lang: string }) 
           <h2 className="text-3xl font-extrabold text-[#1a365d] mb-2">{dict.categories.title}</h2>
           <p className="text-gray-500">{dict.categories.subtitle}</p>
         </div>
-        <Link href={`/${lang}/shops`} className="flex items-center gap-2 text-[#1a365d] font-bold hover:text-blue-700 transition group">
+        <Link href={`/${lang}/search`} className="flex items-center gap-2 text-[#1a365d] font-bold hover:text-blue-700 transition group">
           {dict.categories.viewAll}
           {lang === 'ar' ? (
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -66,7 +66,7 @@ export default function Categories({ dict, lang }: { dict: any, lang: string }) 
           return (
             <motion.div key={category.id} variants={itemVariants}>
               <Link 
-                href="#"
+                href={`/${lang}/search?category=${category.value}`}
                 className="flex flex-col items-center justify-center p-6 bg-[#e1eaf5] rounded-2xl hover:bg-[#d0dbe9] transition-colors group h-full"
               >
                 <div className="bg-white p-4 rounded-xl shadow-sm text-[#1a365d] mb-4 group-hover:scale-110 transition-transform">

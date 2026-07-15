@@ -70,45 +70,47 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
           className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10"
         >
           {stores.map((store) => (
-            <motion.div key={store.id} variants={itemVariants} className="bg-white rounded-3xl p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="font-extrabold text-lg text-[#1a365d] mb-1">{store.name}</h3>
-                  {store.verified && (
-                    <div className="flex items-center gap-1 text-xs font-bold text-[#846b2b]">
-                      <BadgeCheck className="w-3.5 h-3.5" />
-                      {dict.stores.verified}
-                    </div>
-                  )}
-                </div>
-                <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
-                  <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
-                </div>
-              </div>
-              
-              <p className="text-gray-500 text-sm leading-relaxed mb-8 flex-1">
-                {store.description}
-              </p>
-              
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
-                <Link href="#" className="flex items-center gap-2 text-[#2b4c7e] font-bold text-sm hover:text-[#1a365d] transition-colors group">
-                  {dict.stores.visit}
-                  {lang === 'ar' ? (
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  )}
-                </Link>
-                
-                <div className="flex items-center -space-x-2 space-x-reverse">
-                  <div className="w-8 h-8 rounded-full bg-[#8b9bb4]/20 border-2 border-white"></div>
-                  <div className="w-8 h-8 rounded-full bg-[#8b9bb4]/40 border-2 border-white"></div>
-                  <div className="w-8 h-8 rounded-full bg-[#2b4c7e] border-2 border-white text-white text-[10px] font-bold flex items-center justify-center z-10">
-                    {store.itemsCount}
+            <Link href={`/${lang}/shops`} key={store.id}>
+              <motion.div variants={itemVariants} className="bg-white rounded-3xl p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="font-extrabold text-lg text-[#1a365d] mb-1">{store.name}</h3>
+                    {store.verified && (
+                      <div className="flex items-center gap-1 text-xs font-bold text-[#846b2b]">
+                        <BadgeCheck className="w-3.5 h-3.5" />
+                        {dict.stores.verified}
+                      </div>
+                    )}
+                  </div>
+                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
+                    <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
                   </div>
                 </div>
-              </div>
-            </motion.div>
+                
+                <p className="text-gray-500 text-sm leading-relaxed mb-8 flex-1">
+                  {store.description}
+                </p>
+                
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+                  <div className="flex items-center gap-2 text-[#2b4c7e] font-bold text-sm group-hover:text-[#1a365d] transition-colors group">
+                    {dict.stores.visit}
+                    {lang === 'ar' ? (
+                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                    ) : (
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center -space-x-2 space-x-reverse">
+                    <div className="w-8 h-8 rounded-full bg-[#8b9bb4]/20 border-2 border-white"></div>
+                    <div className="w-8 h-8 rounded-full bg-[#8b9bb4]/40 border-2 border-white"></div>
+                    <div className="w-8 h-8 rounded-full bg-[#2b4c7e] border-2 border-white text-white text-[10px] font-bold flex items-center justify-center z-10">
+                      {store.itemsCount}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </motion.div>
       </div>

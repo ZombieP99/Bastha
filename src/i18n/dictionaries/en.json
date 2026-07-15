@@ -137,5 +137,35 @@
     "feature1": "Reliable",
     "feature2": "Fast",
     "feature3": "Support"
+  },
+  "newArrivals": {
+    "title": "New Arrivals",
+    "subtitle": "Discover the latest products added to our stores."
+  },
+  "product": {
+    "details": "Product Details",
+    "comparePrices": "Compare Prices",
+    "availableStores": "Available Stores",
+    "reviews": "Ratings & Reviews",
+    "addToCart": "Add to Cart",
+    "outOfStock": "Out of Stock",
+    "description": "Description",
+    "specifications": "Specifications",
+    "seller": "Seller"
+  },
+  "search": {
+    "resultsFor": "Search results for",
+    "noResults": "No results found.",
+    "filters": "Filters",
+    "categories": "Categories",
+    "priceRange": "Price",
+    "rating": "Rating",
+    "sort": "Sort by",
+    "sortNewest": "Newest",
+    "sortPriceLowHigh": "Price: Low to High",
+    "sortPriceHighLow": "Price: High to Low",
+    "sortRating": "Highest Rated",
+    "applyFilters": "Apply Filters",
+    "clearFilters": "Clear Filters"
   }
 }

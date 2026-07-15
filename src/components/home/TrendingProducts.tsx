@@ -1,6 +1,7 @@
 'use client';
 import { Heart, ShoppingCart, Star, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function TrendingProducts({ dict, lang }: { dict: any, lang: string }) {
   const products = [
@@ -85,43 +86,53 @@ export default function TrendingProducts({ dict, lang }: { dict: any, lang: stri
       >
         {products.map((product) => (
           <motion.div key={product.id} variants={itemVariants} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group border border-gray-100 flex flex-col h-full">
-            <div className="relative aspect-square overflow-hidden bg-gray-100">
-              <img 
-                src={product.image} 
-                alt={product.title} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              
-              <button className={`absolute top-3 ${lang === 'ar' ? 'right-3' : 'left-3'} w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-400 hover:text-red-500 shadow-sm transition-colors`}>
-                <Heart className="w-4 h-4" />
-              </button>
-              
-              {product.badge && (
-                <div className={`absolute ${product.badge.type === 'new' ? `top-3 ${lang === 'ar' ? 'left-3' : 'right-3'} bg-[#1a365d] text-white` : `bottom-3 ${lang === 'ar' ? 'right-3' : 'left-3'} bg-[#eab308] text-[#1a365d]`} px-3 py-1 rounded-full text-xs font-bold`}>
-                  {product.badge.text}
-                </div>
-              )}
-            </div>
-            
-            <div className="p-5 flex flex-col flex-1">
-              <span className="text-xs text-gray-400 font-medium mb-1 block">{product.category}</span>
-              <h3 className="font-bold text-[#1a365d] mb-2 line-clamp-2 leading-snug">{product.title}</h3>
-              
-              <div className="flex items-center gap-1 mb-4 mt-auto">
-                <Star className="w-3.5 h-3.5 text-[#eab308] fill-[#eab308]" />
-                <span className="text-sm font-bold text-gray-700">{product.rating}</span>
-                <span className="text-xs text-gray-400">({product.reviews} {dict.trending.reviews})</span>
+            <Link href={`/${lang}/products/${product.id}`} className="flex flex-col h-full">
+              <div className="relative aspect-square overflow-hidden bg-gray-100">
+                <img 
+                  src={product.image} 
+                  alt={product.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                
+                <button 
+                  onClick={(e) => e.preventDefault()}
+                  className={`absolute top-3 ${lang === 'ar' ? 'right-3' : 'left-3'} w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-400 hover:text-red-500 shadow-sm transition-colors`}
+                >
+                  <Heart className="w-4 h-4" />
+                </button>
+                
+                {product.badge && (
+                  <div className={`absolute ${product.badge.type === 'new' ? `top-3 ${lang === 'ar' ? 'left-3' : 'right-3'} bg-[#1a365d] text-white` : `bottom-3 ${lang === 'ar' ? 'right-3' : 'left-3'} bg-[#eab308] text-[#1a365d]`} px-3 py-1 rounded-full text-xs font-bold`}>
+                    {product.badge.text}
+                  </div>
+                )}
               </div>
               
-              <div className="flex items-center justify-between mt-2 pt-4 border-t border-gray-50">
-                <div className="font-extrabold text-[#1a365d] text-lg flex items-center gap-1">
-                  {lang === 'en' ? dict.common.currency : ''} {product.price} {lang === 'ar' ? dict.common.currency : ''}
+              <div className="p-5 flex flex-col flex-1">
+                <span className="text-xs text-gray-400 font-medium mb-1 block">{product.category}</span>
+                <h3 className="font-bold text-[#1a365d] mb-2 line-clamp-2 leading-snug">{product.title}</h3>
+                
+                <div className="flex items-center gap-1 mb-4 mt-auto">
+                  <Star className="w-3.5 h-3.5 text-[#eab308] fill-[#eab308]" />
+                  <span className="text-sm font-bold text-gray-700">{product.rating}</span>
+                  <span className="text-xs text-gray-400">({product.reviews} {dict.trending.reviews})</span>
                 </div>
-                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="w-9 h-9 rounded-full bg-[#e1eaf5] text-[#1a365d] flex items-center justify-center hover:bg-[#1a365d] hover:text-white transition-colors">
-                  <ShoppingCart className="w-4 h-4" />
-                </motion.button>
+                
+                <div className="flex items-center justify-between mt-2 pt-4 border-t border-gray-50">
+                  <div className="font-extrabold text-[#1a365d] text-lg flex items-center gap-1">
+                    {lang === 'en' ? dict.common.currency : ''} {product.price} {lang === 'ar' ? dict.common.currency : ''}
+                  </div>
+                  <motion.button 
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    whileHover={{ scale: 1.1 }} 
+                    whileTap={{ scale: 0.9 }} 
+                    className="w-9 h-9 rounded-full bg-[#e1eaf5] text-[#1a365d] flex items-center justify-center hover:bg-[#1a365d] hover:text-white transition-colors"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                  </motion.button>
+                </div>
               </div>
-            </div>
+            </Link>
           </motion.div>
         ))}
       </motion.div>

@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FloatingButton from "@/components/layout/FloatingButton";
 import { getDictionary } from "@/i18n/dictionaries";
+import NextTopLoader from 'nextjs-toploader';
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
@@ -40,6 +41,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} dir={dir} className={`${fontClass} antialiased h-full`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-[#f0f4f8] text-[#1a365d]" suppressHydrationWarning>
+        <NextTopLoader color="#1a365d" showSpinner={false} shadow="0 0 10px #1a365d,0 0 5px #1a365d" />
         <Navbar dict={dict} lang={lang} />
         <main className="flex-1">
           {children}
