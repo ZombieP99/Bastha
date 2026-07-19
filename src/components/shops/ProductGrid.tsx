@@ -29,25 +29,7 @@ export default function ProductGrid({ products, dict, lang }: ProductGridProps) 
 
   return (
     <div className="w-full">
-      {/* Product Search */}
-      <div className="mb-8 max-w-md">
-        <div className="relative group">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={dict?.shopsPage?.shopDetails?.searchProducts || 'Search products...'}
-            className={`w-full bg-white shadow-sm border border-gray-100 rounded-2xl py-3 px-5 text-gray-700 outline-none focus:ring-2 focus:ring-[#1a365d]/20 focus:border-[#1a365d] transition-all ${
-              isAr ? 'pr-11 text-right' : 'pl-11 text-left'
-            }`}
-          />
-          <Search 
-            className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#1a365d] transition-colors ${
-              isAr ? 'right-4' : 'left-4'
-            }`} 
-          />
-        </div>
-      </div>
+
 
       {/* Grid */}
       {filteredProducts.length > 0 ? (

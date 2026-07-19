@@ -15,8 +15,9 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="lg:col-span-2 relative rounded-3xl overflow-hidden min-h-[400px] flex items-end group"
+          className="lg:col-span-2 relative rounded-3xl overflow-hidden min-h-[400px] group"
         >
+          <Link href={`/${lang}/shops/1`} className="flex items-end w-full h-full absolute inset-0">
           <img 
             src="https://picsum.photos/seed/perfume/1200/800" 
             alt="Perfume Store" 
@@ -36,18 +37,13 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
                  {isAr ? 'أرقى العطور المستوحاة من الطبيعة الخلابة' : 'The finest perfumes inspired by stunning nature'}
                </p>
                
-               <Link href={`/${lang}/shops`}>
-                 <motion.button 
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                   className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/40 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors"
-                 >
-                   {dict?.shopsPage?.visitShop}
-                   {isAr ? <ArrowLeft className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
-                 </motion.button>
-               </Link>
+               <div className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/40 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors inline-flex w-fit">
+                 {dict?.shopsPage?.visitShop}
+                 {isAr ? <ArrowLeft className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+               </div>
             </div>
           </div>
+          </Link>
         </motion.div>
 
         {/* Two smaller banners stacked (Left/Second depending on RTL) */}
@@ -57,8 +53,9 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] flex items-end group"
+            className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] group"
           >
+            <Link href={`/${lang}/shops/2`} className="flex items-end w-full h-full absolute inset-0">
             <img 
               src="https://picsum.photos/seed/decor/800/600" 
               alt="Home Decor" 
@@ -68,19 +65,21 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             <div className={`relative z-10 p-6 w-full text-white ${isAr ? 'text-right' : 'text-left'}`}>
                <h3 className="text-2xl font-bold mb-1">{isAr ? 'لمسات دافئة' : 'Warm Touches'}</h3>
                <p className="text-white/70 text-sm mb-3">{isAr ? 'ديكورات منزلية بأسلوب حديث' : 'Modern style home decor'}</p>
-               <Link href={`/${lang}/shops`} className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link">
+               <div className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link mt-2">
                  {dict?.shopsPage?.discoverMore}
                  {isAr ? <ArrowLeft className="w-4 h-4 group-hover/link:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />}
-               </Link>
+               </div>
             </div>
+            </Link>
           </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] flex items-end group"
+            className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] group"
           >
+            <Link href={`/${lang}/shops/3`} className="flex items-end w-full h-full absolute inset-0">
             <img 
               src="https://picsum.photos/seed/watches/800/600" 
               alt="Watches" 
@@ -90,11 +89,12 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             <div className={`relative z-10 p-6 w-full text-white ${isAr ? 'text-right' : 'text-left'}`}>
                <h3 className="text-2xl font-bold mb-1">{isAr ? 'وقت وفن' : 'Time & Art'}</h3>
                <p className="text-white/70 text-sm mb-3">{isAr ? 'تشكيلة واسعة من الساعات الفاخرة' : 'A wide selection of luxury watches'}</p>
-               <Link href={`/${lang}/shops`} className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link">
+               <div className="inline-flex items-center gap-1 text-[#eab308] font-bold text-sm hover:text-yellow-400 group/link mt-2">
                  {dict?.shopsPage?.discoverMore}
                  {isAr ? <ArrowLeft className="w-4 h-4 group-hover/link:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />}
-               </Link>
+               </div>
             </div>
+            </Link>
           </motion.div>
 
         </div>

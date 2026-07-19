@@ -1,6 +1,6 @@
 import { getDictionary } from '@/i18n/dictionaries';
 import ShopDetailsHeader from '@/components/shops/ShopDetailsHeader';
-import ProductGrid from '@/components/shops/ProductGrid';
+import ShopTabs from '@/components/shops/ShopTabs';
 import { Product } from '@/components/shops/ProductCard';
 import { notFound } from 'next/navigation';
 
@@ -130,21 +130,7 @@ export default async function ShopDetailsPage({
       {/* Main Content Area */}
       <div className="container mx-auto px-4 md:px-8">
         
-        {/* Section Tabs */}
-        <div className={`flex items-center gap-8 mb-8 border-b border-gray-200 ${isAr ? 'flex-row-reverse' : 'flex-row'}`}>
-          <div className="border-b-4 border-[#1a365d] pb-4 px-2">
-            <h2 className="text-xl font-extrabold text-[#1a365d]">{dict?.shopsPage?.shopDetails?.products}</h2>
-          </div>
-          <div className="pb-4 px-2 text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
-            <h2 className="text-xl font-bold">{dict?.shopsPage?.shopDetails?.overview}</h2>
-          </div>
-          <div className="pb-4 px-2 text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
-            <h2 className="text-xl font-bold">{dict?.shopsPage?.shopDetails?.reviews}</h2>
-          </div>
-        </div>
-
-        {/* Product Grid */}
-        <ProductGrid products={products} dict={dict} lang={lang} />
+        <ShopTabs shop={shop} products={products} dict={dict} lang={lang} />
         
       </div>
     </div>

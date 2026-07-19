@@ -23,6 +23,7 @@ export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: any; 
       }}
       className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full group"
     >
+      <Link href={`/${lang}/shops/${shop.id}`} className="flex flex-col h-full cursor-pointer">
       {/* Cover Image & Rating */}
       <div className="relative h-48 overflow-hidden bg-gray-100">
         <img 
@@ -54,17 +55,12 @@ export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: any; 
 
         {/* Visit Button */}
         <div className="mt-auto pt-4 border-t border-gray-50">
-          <Link href={`/${lang}/shops/${shop.id}`} className="block w-full">
-            <motion.button 
-              whileHover={{ scale: 1.02 }} 
-              whileTap={{ scale: 0.98 }} 
-              className="w-full bg-[#2b4c7e] text-white font-bold py-3.5 rounded-xl hover:bg-[#1a365d] transition-colors shadow-sm"
-            >
-              {dict?.shopsPage?.visitShop}
-            </motion.button>
-          </Link>
+          <div className="w-full bg-[#2b4c7e] text-center text-white font-bold py-3.5 rounded-xl group-hover:bg-[#1a365d] transition-colors shadow-sm">
+            {dict?.shopsPage?.visitShop}
+          </div>
         </div>
       </div>
+      </Link>
     </motion.div>
   );
 }

@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export interface Product {
   id: number;
@@ -34,6 +35,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <Link href={`/${lang}/products/${product.id}`} className="flex flex-col h-full cursor-pointer">
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img 
@@ -86,6 +88,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
           </div>
 
           <motion.button 
+            onClick={(e) => e.preventDefault()}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={!product.inStock}
@@ -100,6 +103,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
           </motion.button>
         </div>
       </div>
+      </Link>
     </motion.div>
   );
 }

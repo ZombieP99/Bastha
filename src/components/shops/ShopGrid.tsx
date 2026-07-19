@@ -170,68 +170,12 @@ export default function ShopGrid({ dict, lang }: { dict: any; lang: string }) {
   return (
     <section className="container mx-auto px-4 md:px-8 py-8 md:py-12">
       
-      {/* Title & Dropdown Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+      <div className="mb-8">
         <h2 className="text-3xl font-extrabold text-[#1a365d]">
           {dict?.shopsPage?.title}
         </h2>
-        
-        {/* Sorting Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button 
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 bg-[#f0f4f8] text-[#1a365d] px-5 py-2.5 rounded-xl font-bold border border-transparent hover:border-gray-200 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              {getSortIcon(sortOrder)}
-              <span>{getSortLabel(sortOrder)}</span>
-            </div>
-            <motion.div animate={{ rotate: isDropdownOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-4 h-4" />
-            </motion.div>
-          </button>
-
-          <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                className={`absolute z-30 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden ${isAr ? 'left-0' : 'right-0'}`}
-              >
-                <div className="py-2 flex flex-col">
-                  {(['newest', 'topRated', 'popular'] as SortOption[]).map((option) => (
-                    <button
-                      key={option}
-                      onClick={() => {
-                        setSortOrder(option);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`w-full px-5 py-3 text-sm font-bold transition-colors flex items-center gap-3 text-start ${
-                        sortOrder === option ? 'bg-[#1a365d]/5 text-[#1a365d]' : 'text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      {getSortIcon(option)}
-                      <span>{getSortLabel(option)}</span>
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
 
-      {/* Search & Category Filters */}
-      <ShopFilters 
-        dict={dict} 
-        lang={lang} 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
 
       {/* Grid Area */}
       {isLoading ? (
