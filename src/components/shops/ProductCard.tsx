@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export interface Product {
   id: number;
@@ -24,6 +24,11 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
   const isAr = lang === 'ar';
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/${lang}/products/${product.id}`);
+  };
 
   return (
     <motion.div
@@ -31,11 +36,11 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0 }
       }}
-      className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full group relative"
+      className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full group relative cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleCardClick}
     >
-      <Link href={`/${lang}/products/${product.id}`} className="flex flex-col h-full cursor-pointer">
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img 
@@ -46,7 +51,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
         
         {/* Like Button */}
         <button 
-          onClick={(e) => { e.preventDefault(); setIsLiked(!isLiked); }}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setIsLiked(!isLiked); }}
           className={`absolute top-4 ${isAr ? 'left-4' : 'right-4'} z-10 p-2.5 rounded-full backdrop-blur-md transition-all ${
             isLiked ? 'bg-red-50 text-red-500' : 'bg-white/80 text-gray-500 hover:bg-white hover:text-red-500'
           }`}
@@ -88,7 +93,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
           </div>
 
           <motion.button 
-            onClick={(e) => e.preventDefault()}
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={!product.inStock}
@@ -103,7 +108,6 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
           </motion.button>
         </div>
       </div>
-      </Link>
     </motion.div>
   );
 }

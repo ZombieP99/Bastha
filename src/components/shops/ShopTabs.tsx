@@ -18,6 +18,12 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
   // Tabs: 'overview' | 'products' | 'reviews'
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'reviews'>('overview');
 
+  // Review Form States
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const tabs = [
     { id: 'overview', label: dict?.shopsPage?.shopDetails?.overview || (isAr ? 'نظرة عامة' : 'Overview') },
     { id: 'products', label: dict?.shopsPage?.shopDetails?.products || (isAr ? 'المنتجات' : 'Products') },
