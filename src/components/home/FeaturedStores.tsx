@@ -1,35 +1,21 @@
 'use client';
-import { BadgeCheck, ArrowLeft, ArrowRight } from 'lucide-react';
+import { BadgeCheck, ArrowLeft, ArrowRight, Store as StoreIcon } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { getTopShops } from '@/lib/api';
+import { Shop } from '@/types';
 
 export default function FeaturedStores({ dict, lang }: { dict: any, lang: string }) {
-  const stores = [
-    {
-      id: 1,
-      name: lang === 'en' ? 'Purity Harvest' : 'حصاد النقاء',
-      description: lang === 'en' ? '100% organic and natural products directly from local farms to your table.' : 'منتجات عضوية وطبيعية ١٠٠٪ مباشرة من المزارع المحلية إلى مائدتكم.',
-      logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=200&auto=format&fit=crop',
-      verified: true,
-      itemsCount: '+25'
-    },
-    {
-      id: 2,
-      name: lang === 'en' ? 'Elegance Boutique' : 'بوتيك الأناقة',
-      description: lang === 'en' ? 'Modern designs that suit all tastes and occasions with quality fabrics.' : 'تصاميم عصرية تناسب جميع الأذواق والمناسبات مع جودة أقمشة لا...',
-      logo: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=200&auto=format&fit=crop',
-      verified: true,
-      itemsCount: '+80'
-    },
-    {
-      id: 3,
-      name: lang === 'en' ? 'TechNova Electronics' : 'تك نوفا للإلكترونيات',
-      description: lang === 'en' ? 'The latest smart devices and accessories with warranty and after-sales service.' : 'أحدث الأجهزة الذكية وملحقاتها بضمان الوكيل وخدمة ما بعد البيع...',
-      logo: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=200&auto=format&fit=crop',
-      verified: true,
-      itemsCount: '+50'
-    }
-  ];
+  const [stores, setStores] = useState<Shop[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTopShops(3).then((data) => {
+      setStores(data);
+      setLoading(false);
+    }).catch(console.error);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -43,6 +29,12 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
     hidden: { opacity: 0, scale: 0.95 },
     show: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
+
+  if (loading) {
+    return <div className="container mx-auto px-4 py-12 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a365d]"></div></div>;
+  }
+
+  if (stores.length === 0) return null;
 
   return (
     <section className="container mx-auto px-4 md:px-8 py-12">
@@ -70,25 +62,29 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
           className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10"
         >
           {stores.map((store) => (
-            <Link href={`/${lang}/shops`} key={store.id}>
+            <Link href={`/${lang}/shops/${store._id}`} key={store._id}>
               <motion.div variants={itemVariants} className="bg-white rounded-3xl p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-extrabold text-lg text-[#1a365d] mb-1">{store.name}</h3>
-                    {store.verified && (
+                    {store.isVerified && (
                       <div className="flex items-center gap-1 text-xs font-bold text-[#846b2b]">
                         <BadgeCheck className="w-3.5 h-3.5" />
                         {dict.stores.verified}
                       </div>
                     )}
                   </div>
-                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
-                    <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
+                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50 flex items-center justify-center text-gray-400 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
+                    {store.logoUrl ? (
+                      <img src={store.logoUrl} alt={store.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <StoreIcon className="w-6 h-6" />
+                    )}
                   </div>
                 </div>
                 
                 <p className="text-gray-500 text-sm leading-relaxed mb-8 flex-1">
-                  {store.description}
+                  {store.description || (lang === 'ar' ? 'متجر مميز يقدم منتجات رائعة.' : 'A featured store offering great products.')}
                 </p>
                 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
@@ -100,13 +96,8 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     )}
                   </div>
-                  
-                  <div className="flex items-center -space-x-2 space-x-reverse">
-                    <div className="w-8 h-8 rounded-full bg-[#8b9bb4]/20 border-2 border-white"></div>
-                    <div className="w-8 h-8 rounded-full bg-[#8b9bb4]/40 border-2 border-white"></div>
-                    <div className="w-8 h-8 rounded-full bg-[#2b4c7e] border-2 border-white text-white text-[10px] font-bold flex items-center justify-center z-10">
-                      {store.itemsCount}
-                    </div>
+                  <div className="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+                    {store.ratingAvg > 0 ? `★ ${store.ratingAvg.toFixed(1)}` : (lang === 'ar' ? 'جديد' : 'New')}
                   </div>
                 </div>
               </motion.div>

@@ -5,8 +5,8 @@ export default async function AuthPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ lang: string }>;
-  searchParams: Promise<{ mode?: string }>;
+  params: Promise<any>;
+  searchParams: Promise<any>;
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;

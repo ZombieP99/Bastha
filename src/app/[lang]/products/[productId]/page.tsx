@@ -4,7 +4,7 @@ import ProductDetails from '@/components/products/ProductDetails';
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ lang: string; productId: string }>;
+  params: Promise<any>;
 }) {
   const resolvedParams = await params;
   const lang = resolvedParams.lang as 'en' | 'ar';

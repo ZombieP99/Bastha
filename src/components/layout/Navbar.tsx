@@ -1,15 +1,41 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, ShoppingCart, ShoppingBag, Globe, X, Tag, Sparkles, Flame, Laptop, Heart, Dumbbell, Home, Shirt, Baby, Store, Package } from 'lucide-react';
+import { Search, ShoppingCart, ShoppingBag, Globe, X, Tag, Sparkles, Flame, Laptop, Heart, Dumbbell, Home, Shirt, Baby, Store, Package, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getCategories, searchProducts } from '@/lib/api';
+import { Category } from '@/types';
 
 export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [liveSuggestions, setLiveSuggestions] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(console.error);
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setLiveSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setIsSearching(true);
+      searchProducts(searchQuery, undefined, undefined, 1, 5)
+        .then((data) => {
+          setLiveSuggestions(data.products.map((p: any) => ({ name: lang === 'ar' ? p.nameAr : p.name, type: 'product' })));
+        })
+        .finally(() => setIsSearching(false));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, lang]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,19 +64,6 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
       ? "text-[#1a365d] border-b-2 border-[#1a365d] pb-1 font-bold"
       : "hover:text-[#1a365d] transition pb-1 border-b-2 border-transparent hover:border-[#1a365d]";
   };
-
-  const searchSuggestions = [
-    // Products
-    { name: lang === 'ar' ? 'سماعة رأس لاسلكية' : 'Wireless Headphones', type: 'product' },
-    { name: lang === 'ar' ? 'مجموعة العناية بالبشرة' : 'Skincare Set', type: 'product' },
-    { name: lang === 'ar' ? 'ساعة كلاسيكية فاخرة' : 'Luxury Classic Watch', type: 'product' },
-    { name: lang === 'ar' ? 'مساعد منزلي ذكي' : 'Smart Home Assistant', type: 'product' },
-    // Shops
-    { name: lang === 'ar' ? 'مخبز اليازجي' : 'Al-Yazji Bakery', type: 'shop' },
-    { name: lang === 'ar' ? 'أزياء سمر' : 'Samar Fashion', type: 'shop' },
-    { name: lang === 'ar' ? 'مجوهرات الشرفا' : 'Al-Shorafa Jewelry', type: 'shop' },
-    { name: lang === 'ar' ? 'تقنية الرائد' : 'Al-Raed Tech', type: 'shop' },
-  ].filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase().trim()));
 
   return (
     <>
@@ -112,9 +125,13 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
                   /* Auto-complete suggestions */
                   <div>
                     <h3 className="font-bold text-gray-800 text-lg mb-4">{lang === 'ar' ? 'مقترحات البحث' : 'Search Suggestions'}</h3>
-                    {searchSuggestions.length > 0 ? (
+                    {isSearching ? (
+                      <div className="flex justify-center p-4">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#1a365d]" />
+                      </div>
+                    ) : liveSuggestions.length > 0 ? (
                       <div className="flex flex-col gap-2">
-                        {searchSuggestions.map((suggestion, idx) => (
+                        {liveSuggestions.map((suggestion, idx) => (
                           <button 
                             key={idx}
                             onClick={() => {
@@ -125,10 +142,10 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
                             className={`flex items-center gap-3 bg-gray-50 hover:bg-gray-100 border border-transparent hover:border-gray-200 p-3 px-4 rounded-xl transition-colors w-full ${lang === 'ar' ? 'flex-row text-right' : 'flex-row text-left'}`}
                           >
                             <span className="font-bold text-[#1a365d]">{suggestion.name}</span>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                            <span className={`text-xs font-bold px-2.5 py-1 rounded-md text-white shadow-sm ${
                               suggestion.type === 'shop' 
-                                ? 'bg-indigo-50 text-indigo-600 border-indigo-100' 
-                                : 'bg-orange-50 text-orange-600 border-orange-100'
+                                ? 'bg-indigo-500' 
+                                : 'bg-[#eab308]'
                             }`}>
                               {suggestion.type === 'shop' ? (lang === 'ar' ? 'متجر' : 'Shop') : (lang === 'ar' ? 'منتج' : 'Product')}
                             </span>
@@ -170,31 +187,27 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
                 {/* Browse */}
                 <div>
                   <h3 className="font-bold text-gray-800 text-lg mb-4">{lang === 'ar' ? 'تصفح الأقسام' : 'Browse Categories'}</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {[
-                      { name: lang === 'ar' ? 'عروض وخصومات' : 'Sales & Offers', icon: <Tag className="w-5 h-5 text-blue-500" /> },
-                      { name: lang === 'ar' ? 'وصل حديثاً' : 'New Arrivals', icon: <Sparkles className="w-5 h-5 text-purple-500" /> },
-                      { name: lang === 'ar' ? 'الأكثر مبيعاً' : 'Best Sellers', icon: <Flame className="w-5 h-5 text-orange-500" /> },
-                      { name: lang === 'ar' ? 'إلكترونيات' : 'Electronics', icon: <Laptop className="w-5 h-5 text-gray-700" /> },
-                      { name: lang === 'ar' ? 'الصحة والجمال' : 'Health & Beauty', icon: <Heart className="w-5 h-5 text-pink-500" /> },
-                      { name: lang === 'ar' ? 'الرياضة' : 'Sports', icon: <Dumbbell className="w-5 h-5 text-green-600" /> },
-                      { name: lang === 'ar' ? 'المنزل' : 'Home', icon: <Home className="w-5 h-5 text-teal-600" /> },
-                      { name: lang === 'ar' ? 'أزياء' : 'Fashion', icon: <Shirt className="w-5 h-5 text-indigo-500" /> },
-                      { name: lang === 'ar' ? 'ألعاب أطفال' : 'Baby & Toys', icon: <Baby className="w-5 h-5 text-yellow-600" /> },
-                    ].map((cat, idx) => (
-                      <button 
-                        key={idx}
-                        onClick={() => {
-                          setIsSearchFocused(false);
-                          router.push(`/${lang}/search?category=${encodeURIComponent(cat.name)}`);
-                        }}
-                        className={`flex items-center gap-3 bg-gray-50 hover:bg-gray-100 border border-gray-100 p-3.5 rounded-2xl transition-colors ${lang === 'ar' ? 'text-right flex-row' : 'text-left flex-row'}`}
-                      >
-                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm border border-gray-100">{cat.icon}</span>
-                        <span className="font-bold text-sm text-gray-700">{cat.name}</span>
-                      </button>
-                    ))}
-                  </div>
+                  {categories.length === 0 ? (
+                    <div className="flex justify-center p-4"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {categories.map((cat) => (
+                        <button 
+                          key={cat._id}
+                          onClick={() => {
+                            setIsSearchFocused(false);
+                            router.push(`/${lang}/search?category=${encodeURIComponent(cat._id)}`);
+                          }}
+                          className={`flex items-center gap-3 bg-gray-50 hover:bg-gray-100 border border-gray-100 p-3.5 rounded-2xl transition-colors ${lang === 'ar' ? 'text-right flex-row' : 'text-left flex-row'}`}
+                        >
+                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm border border-gray-100">
+                            {cat.icon === 'basket' ? <Package className="w-5 h-5 text-blue-500" /> : <Tag className="w-5 h-5 text-gray-500" />}
+                          </span>
+                          <span className="font-bold text-sm text-gray-700">{lang === 'ar' ? cat.nameAr : cat.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                   </>
                 )}
@@ -240,7 +253,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
         <div className="container mx-auto px-4 md:px-8 py-3 flex items-center justify-between text-sm font-semibold">
           <nav className="flex items-center gap-6 text-gray-600">
             <Link href={`/${lang}`} className={getLinkClass(`/${lang}`)}>{dict.nav.home}</Link>
-            <Link href={`/${lang}/search`} className={getLinkClass(`/${lang}/search`)}>{lang === 'ar' ? 'المنتجات' : 'Products'}</Link>
+            <Link href={`/${lang}/products`} className={getLinkClass(`/${lang}/products`)}>{lang === 'ar' ? 'المنتجات' : 'Products'}</Link>
             <Link href={`/${lang}/shops`} className={getLinkClass(`/${lang}/shops`)}>{dict.nav.featuredStores}</Link>
           </nav>
           

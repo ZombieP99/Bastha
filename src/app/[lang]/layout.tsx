@@ -28,7 +28,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: string }>;
+  params: Promise<any>;
 }>) {
   // Await params as required by Next.js 15+ 
   const resolvedParams = await params;

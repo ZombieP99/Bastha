@@ -4,7 +4,7 @@ import SearchResults from '@/components/search/SearchResults';
 export default async function SearchPage({
   params,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<any>;
 }) {
   const resolvedParams = await params;
   const lang = resolvedParams.lang as 'en' | 'ar';
