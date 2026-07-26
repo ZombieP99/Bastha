@@ -1,24 +1,35 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Star, Sparkles, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import { useCartStore } from '@/store/useCartStore';
 
 export default function ProductCard({ product, lang, isNew = false }: { product: any, lang: string, isNew?: boolean }) {
   const isAr = lang === 'ar';
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  
+  const [mounted, setMounted] = useState(false);
+  const toggleWishlistStore = useWishlistStore(state => state.toggleWishlist);
+  const isInWishlistStore = useWishlistStore(state => state.isInWishlist);
+  const isWishlisted = mounted ? isInWishlistStore(product._id) : false;
+
+  const addItemToCart = useCartStore(state => state.addItem);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    toggleWishlistStore(product);
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // In a real app, this would add to cart state
-    alert(isAr ? 'تمت الإضافة إلى السلة بنجاح!' : 'Added to cart successfully!');
+    addItemToCart(product);
   };
 
   return (

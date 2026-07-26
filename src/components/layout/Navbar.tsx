@@ -6,6 +6,8 @@ import { Search, ShoppingCart, ShoppingBag, Globe, X, Tag, Sparkles, Flame, Lapt
 import { motion } from 'framer-motion';
 import { getCategories, searchProducts } from '@/lib/api';
 import { Category } from '@/types';
+import { useCartStore } from '@/store/useCartStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
 
 export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const pathname = usePathname();
@@ -15,6 +17,14 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [liveSuggestions, setLiveSuggestions] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const totalCartItems = useCartStore((state) => state.getTotalItems());
+  const totalWishlistItems = useWishlistStore((state) => state.items.length);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     getCategories().then(setCategories).catch(console.error);
@@ -237,13 +247,26 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
             </Link>
           </div>
           
-          <Link href="#" className="relative flex items-center group">
+          <Link href={`/${lang}/wishlist`} className="relative flex items-center group">
+            <motion.div whileHover={{ scale: 1.1 }}>
+              <Heart className="w-6 h-6 text-gray-700 group-hover:text-red-500 transition-colors" />
+            </motion.div>
+            {mounted && totalWishlistItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                {totalWishlistItems}
+              </span>
+            )}
+          </Link>
+
+          <Link href={`/${lang}/cart`} className="relative flex items-center group">
             <motion.div whileHover={{ scale: 1.1 }}>
               <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-[#1a365d] transition-colors" />
             </motion.div>
-            <span className="absolute -top-2 -right-2 bg-[#a38024] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
-              3
-            </span>
+            {mounted && totalCartItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[#a38024] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                {totalCartItems}
+              </span>
+            )}
           </Link>
         </div>
       </div>
