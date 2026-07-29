@@ -203,8 +203,8 @@ export default function FloatingButton({ dict, lang }: { dict: any, lang: string
       <motion.button 
         onClick={() => setIsOpen(!isOpen)}
         animate={{ y: [0, -10, 0] }}
-        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        whileHover={{ scale: 1.05, rotate: isAr ? -15 : 15 }}
+        transition={{ y: { repeat: Infinity, duration: 2, ease: "easeInOut" } }}
+        whileHover={{ scale: 1.05, rotate: isAr ? -15 : 15, transition: { duration: 0.2 } }}
         whileTap={{ scale: 0.95 }}
         className={`fixed bottom-6 z-50 bg-[#6b705c] hover:bg-[#5a5e4d] text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-colors font-bold ${isAr ? 'left-6' : 'right-6'}`}
       >
