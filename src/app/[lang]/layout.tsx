@@ -47,7 +47,7 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer dict={dict} />
-        <FloatingButton dict={dict} />
+        <FloatingButton dict={dict} lang={lang} />
       </body>
     </html>
   );

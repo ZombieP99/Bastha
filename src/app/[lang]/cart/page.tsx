@@ -63,7 +63,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                   <AnimatePresence>
                     {items.map((item) => (
                       <motion.div 
-                        key={item.id}
+                        key={item.listing._id}
                         layout
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -71,11 +71,11 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                         className="flex flex-col sm:flex-row items-center gap-6 py-6 border-b border-gray-100 last:border-0"
                       >
                         {/* Image */}
-                        <Link href={`/${lang}/product/${item.product._id}`}>
+                        <Link href={`/${lang}/product/${item.listing.product._id}`}>
                           <div className="w-24 h-24 rounded-2xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
                             <img 
-                              src={item.product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
-                              alt={isAr ? item.product.nameAr : item.product.name}
+                              src={item.listing.product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
+                              alt={isAr ? item.listing.product.nameAr : item.listing.product.name}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -84,24 +84,22 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                         {/* Details */}
                         <div className="flex-1 w-full text-center sm:text-start">
                           <div className="text-xs font-bold text-[#2b4c7e] mb-1 bg-[#eaf1f8] inline-block px-2 py-1 rounded-md">
-                            {typeof item.product.category === 'object' && item.product.category !== null 
-                              ? (isAr ? item.product.category.nameAr : item.product.category.name) 
-                              : 'Category'}
+                            {item.listing.shop?.name || 'Store'}
                           </div>
-                          <Link href={`/${lang}/product/${item.product._id}`}>
+                          <Link href={`/${lang}/product/${item.listing.product._id}`}>
                             <h3 className="font-bold text-gray-800 text-lg hover:text-[#1a365d] transition-colors line-clamp-2">
-                              {isAr ? item.product.nameAr : item.product.name}
+                              {isAr ? item.listing.product.nameAr : item.listing.product.name}
                             </h3>
                           </Link>
                           <p className="text-[#a38024] font-bold mt-2">
-                            {item.price} ₪
+                            {item.listing.price} ₪
                           </p>
                         </div>
 
                         {/* Actions */}
                         <div className="flex flex-col sm:items-end gap-4 w-full sm:w-auto">
                           <button 
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => removeItem(item.listing._id)}
                             className="text-gray-400 hover:text-red-500 transition-colors p-2 self-end sm:self-auto"
                             title={isAr ? 'حذف' : 'Remove'}
                           >
@@ -110,7 +108,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                           
                           <div className="flex items-center justify-between sm:justify-start gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
                             <button 
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.listing._id, item.quantity - 1)}
                               disabled={item.quantity <= 1}
                               className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm disabled:opacity-50 hover:bg-gray-100 transition-colors"
                             >
@@ -120,7 +118,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                               {item.quantity}
                             </span>
                             <button 
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.listing._id, item.quantity + 1)}
                               className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm hover:bg-gray-100 transition-colors"
                             >
                               <Plus className="w-4 h-4" />

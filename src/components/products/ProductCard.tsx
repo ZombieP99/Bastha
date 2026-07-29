@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Heart, Star, Sparkles, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { useCartStore } from '@/store/useCartStore';
+import { useRouter } from 'next/navigation';
 
 export default function ProductCard({ product, lang, isNew = false }: { product: any, lang: string, isNew?: boolean }) {
   const isAr = lang === 'ar';
@@ -14,7 +14,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
   const isInWishlistStore = useWishlistStore(state => state.isInWishlist);
   const isWishlisted = mounted ? isInWishlistStore(product._id) : false;
 
-  const addItemToCart = useCartStore(state => state.addItem);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -29,7 +29,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItemToCart(product);
+    router.push(`/${lang}/product/${product._id}`);
   };
 
   return (
@@ -91,7 +91,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
             className="w-full py-2.5 rounded-xl bg-[#1a365d] flex items-center justify-center gap-2 px-4 text-white font-bold hover:bg-[#2b4c7e] hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md group/btn overflow-hidden text-sm"
           >
             <ShoppingCart className="w-4 h-4" />
-            <span>{isAr ? 'أضف إلى السلة' : 'Add to Cart'}</span>
+            <span>{isAr ? 'عرض العروض' : 'View Offers'}</span>
           </button>
         </div>
       </div>

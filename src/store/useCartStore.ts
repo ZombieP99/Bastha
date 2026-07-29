@@ -1,60 +1,117 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { Product } from '@/types';
+import axios from 'axios';
+import { useAuthStore } from './useAuthStore';
+
+// Matches the backend "populated cart shape"
+export interface CartListing {
+  _id: string;
+  price: number;
+  inStock: boolean;
+  shop: { _id: string; name: string; area: string; phone: string };
+  product: { _id: string; name: string; nameAr: string; imageUrl: string; unit: string };
+}
 
 export interface CartItem {
-  id: string; // usually product._id
-  product: Product;
+  listing: CartListing;
   quantity: number;
-  price: number; // Mock price until listings API is fully used in ProductCard
 }
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number, price?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchCart: () => Promise<void>;
+  addItem: (listingId: string, quantity?: number) => Promise<void>;
+  removeItem: (listingId: string) => Promise<void>;
+  updateQuantity: (listingId: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
 
-export const useCartStore = create<CartState>()(
-  persist(
-    (set, get) => ({
-      items: [],
-      addItem: (product, quantity = 1, price = 50) => {
-        const currentItems = get().items;
-        const existingItem = currentItems.find(item => item.id === product._id);
-        
-        if (existingItem) {
-          set({
-            items: currentItems.map(item => 
-              item.id === product._id 
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            )
-          });
-        } else {
-          set({ items: [...currentItems, { id: product._id, product, quantity, price }] });
-        }
-      },
-      removeItem: (productId) => set({
-        items: get().items.filter(item => item.id !== productId)
-      }),
-      updateQuantity: (productId, quantity) => set({
-        items: get().items.map(item => 
-          item.id === productId 
-            ? { ...item, quantity: Math.max(1, quantity) }
-            : item
-        )
-      }),
-      clearCart: () => set({ items: [] }),
-      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
-      getTotalPrice: () => get().items.reduce((total, item) => total + (item.price * item.quantity), 0),
-    }),
-    {
-      name: 'bastah-cart-storage',
+const api = axios.create({
+  baseURL: 'https://bastah-backend.onrender.com/api',
+});
+
+// Interceptor to attach token
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const useCartStore = create<CartState>()((set, get) => ({
+  items: [],
+  isLoading: false,
+  error: null,
+
+  fetchCart: async () => {
+    const { isAuthenticated } = useAuthStore.getState();
+    if (!isAuthenticated) {
+      set({ items: [], isLoading: false });
+      return;
     }
-  )
-);
+    
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.get('/cart');
+      set({ items: res.data.cart.items || [], isLoading: false });
+    } catch (err: any) {
+      console.error('Failed to fetch cart', err);
+      // In case of 401 or 404, we just treat it as empty
+      set({ items: [], isLoading: false, error: err.response?.data?.error || 'Failed to fetch cart' });
+    }
+  },
+
+  addItem: async (listingId: string, quantity = 1) => {
+    const { isAuthenticated } = useAuthStore.getState();
+    if (!isAuthenticated) {
+      throw new Error('You must be logged in to add to cart');
+    }
+
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.post('/cart/items', { listing: listingId, quantity });
+      set({ items: res.data.cart.items || [], isLoading: false });
+    } catch (err: any) {
+      set({ isLoading: false, error: err.response?.data?.error || 'Failed to add item' });
+      throw err;
+    }
+  },
+
+  removeItem: async (listingId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.delete(`/cart/items/${listingId}`);
+      set({ items: res.data.cart.items || [], isLoading: false });
+    } catch (err: any) {
+      set({ isLoading: false, error: err.response?.data?.error || 'Failed to remove item' });
+    }
+  },
+
+  updateQuantity: async (listingId: string, quantity: number) => {
+    if (quantity < 1) return;
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.patch(`/cart/items/${listingId}`, { quantity });
+      set({ items: res.data.cart.items || [], isLoading: false });
+    } catch (err: any) {
+      set({ isLoading: false, error: err.response?.data?.error || 'Failed to update quantity' });
+    }
+  },
+
+  clearCart: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.delete('/cart');
+      set({ items: res.data.cart.items || [], isLoading: false });
+    } catch (err: any) {
+      set({ isLoading: false, error: err.response?.data?.error || 'Failed to clear cart' });
+    }
+  },
+
+  getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
+  getTotalPrice: () => get().items.reduce((total, item) => total + (item.listing.price * item.quantity), 0),
+}));

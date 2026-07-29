@@ -102,9 +102,9 @@ export default function AuthContainer({ dict, lang, initialMode = 'login' }: Aut
                 transition={{ duration: 0.3 }}
               >
                 {isLogin ? (
-                  <LoginForm dict={dict} isAr={isAr} />
+                  <LoginForm dict={dict} isAr={isAr} lang={lang} />
                 ) : (
-                  <SignupForm dict={dict} isAr={isAr} />
+                  <SignupForm dict={dict} isAr={isAr} lang={lang} />
                 )}
               </motion.div>
             </AnimatePresence>

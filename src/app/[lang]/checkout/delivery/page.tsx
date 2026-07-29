@@ -90,12 +90,13 @@ export default function DeliveryPage({ params }: { params: Promise<any> }) {
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:bg-white transition-all"
                 >
                   <option value="">{isAr ? 'اختر المدينة' : 'Select City'}</option>
-                  <option value="ramallah">{isAr ? 'رام الله' : 'Ramallah'}</option>
-                  <option value="nablus">{isAr ? 'نابلس' : 'Nablus'}</option>
-                  <option value="hebron">{isAr ? 'الخليل' : 'Hebron'}</option>
-                  <option value="jenin">{isAr ? 'جنين' : 'Jenin'}</option>
-                  <option value="bethlehem">{isAr ? 'بيت لحم' : 'Bethlehem'}</option>
-                  <option value="tulkarm">{isAr ? 'طولكرم' : 'Tulkarm'}</option>
+                  <option value="gaza">{isAr ? 'غزة' : 'Gaza'}</option>
+                  <option value="north_gaza">{isAr ? 'شمال غزة' : 'North Gaza'}</option>
+                  <option value="deir_al_balah">{isAr ? 'دير البلح' : 'Deir al-Balah'}</option>
+                  <option value="nuseirat">{isAr ? 'النصيرات' : 'Nuseirat'}</option>
+                  <option value="bureij">{isAr ? 'البريج' : 'Bureij'}</option>
+                  <option value="khan_yunis">{isAr ? 'خانيونس' : 'Khan Yunis'}</option>
+                  <option value="rafah">{isAr ? 'رفح' : 'Rafah'}</option>
                 </select>
               </div>
               <div className="space-y-2 md:col-span-2">

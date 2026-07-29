@@ -8,6 +8,7 @@ import { getCategories, searchProducts } from '@/lib/api';
 import { Category } from '@/types';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const pathname = usePathname();
@@ -20,11 +21,21 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const [mounted, setMounted] = useState(false);
 
   const totalCartItems = useCartStore((state) => state.getTotalItems());
+  const fetchCart = useCartStore((state) => state.fetchCart);
   const totalWishlistItems = useWishlistStore((state) => state.items.length);
+  const { isAuthenticated, user, loadUser } = useAuthStore();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    loadUser(); // Load user on mount if token exists
+  }, [loadUser]);
+
+  // Fetch cart when authenticated state changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated, fetchCart]);
 
   useEffect(() => {
     getCategories().then(setCategories).catch(console.error);
@@ -237,14 +248,25 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
           </button>
           
           <div className="hidden sm:flex items-center gap-4 text-sm font-medium">
-            <Link href={`/${lang}/auth?mode=login`} className="text-[#1a365d] hover:text-blue-700 transition">
-              {dict.common.login}
-            </Link>
-            <Link href={`/${lang}/auth?mode=signup`}>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-[#2b4c7e] text-white px-5 py-2.5 rounded-lg hover:bg-[#1a365d] transition cursor-pointer">
-                {dict.common.register}
-              </motion.div>
-            </Link>
+            {mounted && isAuthenticated ? (
+              <Link href={`/${lang}/${user?.role === 'customer' ? 'profile' : 'seller/dashboard'}`} className="flex items-center gap-2 hover:bg-gray-50 px-3 py-1.5 rounded-full transition-colors border border-transparent hover:border-gray-200 cursor-pointer">
+                <div className="w-8 h-8 bg-blue-100 text-[#1a365d] rounded-full flex items-center justify-center font-bold shadow-sm">
+                  {user?.name?.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-bold text-gray-700">{user?.name?.split(' ')[0]}</span>
+              </Link>
+            ) : (
+              <>
+                <Link href={`/${lang}/auth?mode=login`} className="text-[#1a365d] hover:text-blue-700 transition font-bold">
+                  {dict.common.login}
+                </Link>
+                <Link href={`/${lang}/auth?mode=signup`}>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-gradient-to-r from-[#1a365d] to-[#2b4c7e] text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition cursor-pointer font-bold">
+                    {dict.common.register}
+                  </motion.div>
+                </Link>
+              </>
+            )}
           </div>
           
           <Link href={`/${lang}/wishlist`} className="relative flex items-center group">
