@@ -157,8 +157,8 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                   </div>
                 </div>
 
-                <Link href={`/${lang}/checkout/delivery`}>
-                  <button className="w-full bg-[#1a365d] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#2b4c7e] transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
+                <Link href={`/${lang}/checkout`}>
+                  <button className="w-full bg-[#1a365d] text-white px-6 py-4 rounded-xl font-bold text-lg hover:bg-[#2b4c7e] transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 group">
                     <span>{isAr ? 'إتمام الطلب' : 'Proceed to Checkout'}</span>
                     {isAr ? (
                       <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />

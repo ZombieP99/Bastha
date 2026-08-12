@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useCartStore } from '@/store/useCartStore';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import toast from 'react-hot-toast';
 
 interface ProductDetailsProps {
   dict: any;
@@ -39,16 +40,36 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
     fetchProduct();
   }, [productId]);
 
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: isAr ? data?.product?.nameAr : data?.product?.name,
+          text: isAr ? data?.product?.descriptionAr : data?.product?.description,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success(isAr ? 'تم نسخ الرابط بنجاح!' : 'Link copied successfully!');
+      }
+    } catch (error) {
+      toast.error(isAr ? 'حدث خطأ أثناء المشاركة' : 'Error sharing');
+      console.log('Error sharing', error);
+    }
+  };
+
   const handleAddToCart = async (listingId: string) => {
     if (!isAuthenticated) {
+      toast(isAr ? 'يجب تسجيل الدخول أولاً' : 'Please login first', { icon: '🔒' });
       router.push(`/${lang}/auth?mode=login`);
       return;
     }
     setAddingId(listingId);
     try {
       await addItem(listingId, 1);
-      // Show success toast (you could add react-hot-toast later)
-    } catch (err) {
+      toast.success(isAr ? 'تمت الإضافة للسلة بنجاح!' : 'Added to cart successfully!');
+    } catch (err: any) {
+      toast.error(err.message || (isAr ? 'فشل إضافة المنتج' : 'Failed to add product'));
       console.error(err);
     } finally {
       setAddingId(null);
@@ -57,8 +78,18 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#1a365d]" />
+      <div className="container mx-auto px-4 md:px-8 py-12 animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-1/3 mb-8"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="aspect-square bg-gray-200 rounded-2xl w-full"></div>
+          <div className="flex flex-col gap-6 pt-4">
+            <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-10 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-8 bg-gray-200 rounded w-1/3 mt-4"></div>
+            <div className="h-32 bg-gray-200 rounded w-full mt-4"></div>
+            <div className="h-16 bg-gray-200 rounded w-full mt-8"></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -174,6 +205,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleShare}
               className="w-16 h-16 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1a365d] hover:border-[#1a365d] transition"
             >
               <Share2 className="w-6 h-6" />
@@ -254,6 +286,29 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
           </div>
         </div>
       )}
+
+      {/* Mobile Sticky Cart Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center justify-between gap-4 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom,1rem)]">
+        <div className="flex flex-col">
+          <span className="text-xs text-gray-500 font-bold">{dict.common?.total || 'Total'}</span>
+          <span className="text-lg font-black text-[#1a365d]">
+            {bestListing ? `${bestListing.price} ${dict.common?.currency || 'ILS'}` : '-'}
+          </span>
+        </div>
+        <motion.button 
+          whileTap={{ scale: 0.95 }}
+          disabled={!bestListing || (addingToCart && addingId === bestListing?._id)}
+          onClick={() => bestListing && handleAddToCart(bestListing._id)}
+          className="flex-1 bg-[#1a365d] text-white py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-900/20"
+        >
+          {addingToCart && addingId === bestListing?._id ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <ShoppingCart className="w-5 h-5" />
+          )}
+          {dict.product?.addToCart || 'Add to Cart'}
+        </motion.button>
+      </div>
     </div>
   );
 }

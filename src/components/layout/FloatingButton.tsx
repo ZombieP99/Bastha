@@ -34,7 +34,7 @@ export default function FloatingButton({ dict, lang }: { dict: any, lang: string
     "Today's best deals",
   ];
 
-  const handleSend = (text: string) => {
+  const handleSend = async (text: string) => {
     if (!text.trim()) return;
     
     const newUserMsg: Message = { id: Date.now().toString(), type: 'user', text };
@@ -42,24 +42,36 @@ export default function FloatingButton({ dict, lang }: { dict: any, lang: string
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponses = isAr ? [
-        'عظيم! جاري البحث عبر منصتنا...',
-        'لقد وجدت بعض الخيارات التي قد تعجبك.',
-      ] : [
-        'Great! Searching on our platform...',
-        'I found some options you might like.',
-      ];
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: text, lang }),
+      });
+
+      const data = await res.json();
       
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to fetch AI response');
+      }
+
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         type: 'ai',
-        text: randomResponse
+        text: data.text
       }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'ai',
+        text: isAr ? 'عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. يرجى المحاولة لاحقاً.' : 'Sorry, an error occurred while connecting to the AI. Please try again later.'
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (

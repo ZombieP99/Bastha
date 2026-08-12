@@ -40,3 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 API-1.md
+FRONTEND_HANDOFF.md
