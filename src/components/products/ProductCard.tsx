@@ -29,7 +29,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/${lang}/product/${product._id}`);
+    router.push(`/${lang}/products/${product._id}`);
   };
 
   return (
@@ -54,7 +54,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
       </button>
 
       {/* Image */}
-      <Link href={`/${lang}/product/${product._id}`}>
+      <Link href={`/${lang}/products/${product._id}`}>
         <div className="aspect-square rounded-xl overflow-hidden mb-4 relative bg-gray-50">
           <img 
             src={product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
@@ -71,7 +71,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
           {typeof product.category === 'object' && product.category !== null ? (isAr ? product.category.nameAr : product.category.name) : 'Category'}
         </div>
         
-        <Link href={`/${lang}/product/${product._id}`}>
+        <Link href={`/${lang}/products/${product._id}`}>
           <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-[#1a365d] transition-colors h-10">
             {isAr ? product.nameAr : product.name}
           </h3>

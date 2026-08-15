@@ -44,7 +44,7 @@ export default function AIPage({ params }: { params: Promise<any> }) {
     'كيف أتتبع طلبي؟'
   ] : [
     'Looking for comfortable sneakers',
-    'What are today\\'s best deals?',
+    "What are today's best deals?",
     'Need a gift for a friend under 100 NIS',
     'How do I track my order?'
   ];

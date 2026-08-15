@@ -71,7 +71,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                         className="flex flex-col sm:flex-row items-center gap-6 py-6 border-b border-gray-100 last:border-0"
                       >
                         {/* Image */}
-                        <Link href={`/${lang}/product/${item.listing.product._id}`}>
+                        <Link href={`/${lang}/products/${item.listing.product._id}`}>
                           <div className="w-24 h-24 rounded-2xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
                             <img 
                               src={item.listing.product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
@@ -86,7 +86,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                           <div className="text-xs font-bold text-[#2b4c7e] mb-1 bg-[#eaf1f8] inline-block px-2 py-1 rounded-md">
                             {item.listing.shop?.name || 'Store'}
                           </div>
-                          <Link href={`/${lang}/product/${item.listing.product._id}`}>
+                          <Link href={`/${lang}/products/${item.listing.product._id}`}>
                             <h3 className="font-bold text-gray-800 text-lg hover:text-[#1a365d] transition-colors line-clamp-2">
                               {isAr ? item.listing.product.nameAr : item.listing.product.name}
                             </h3>

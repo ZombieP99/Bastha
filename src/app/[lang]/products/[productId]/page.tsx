@@ -10,6 +10,7 @@ export default async function ProductPage({
   const lang = resolvedParams.lang as 'en' | 'ar';
   const productId = resolvedParams.productId;
   const dict = await getDictionary(lang);
+  console.log('Rendering product page for:', productId);
 
   return (
     <div className="bg-white min-h-screen">
