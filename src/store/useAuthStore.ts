@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { User } from '@/types';
 
-const API_URL = 'https://bastah-backend.onrender.com/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bastah-backend.onrender.com/api';
 
 interface AuthState {
   token: string | null;

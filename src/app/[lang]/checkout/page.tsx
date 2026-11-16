@@ -196,9 +196,9 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
     <div className="bg-[#f8fafc] min-h-screen pt-12 pb-20">
       <div className="container mx-auto px-4 md:px-8 max-w-6xl">
         <div className="flex items-center gap-3 mb-10">
-          <ShieldCheck className="w-8 h-8 text-green-600" />
+          <ShieldCheck className="w-8 h-8 text-[#1a365d]" />
           <h1 className="text-3xl font-extrabold text-[#1a365d]">
-            {isAr ? 'إتمام الطلب بأمان' : 'Secure Checkout'}
+            {isAr ? 'تأكيد الطلب' : 'Confirm Order'}
           </h1>
         </div>
 

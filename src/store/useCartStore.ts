@@ -30,7 +30,7 @@ interface CartState {
 }
 
 const api = axios.create({
-  baseURL: 'https://bastah-backend.onrender.com/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://bastah-backend.onrender.com/api',
 });
 
 // Interceptor to attach token

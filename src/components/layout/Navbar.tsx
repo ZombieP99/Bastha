@@ -1,14 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, ShoppingCart, ShoppingBag, Globe, X, Tag, Sparkles, Flame, Laptop, Heart, Dumbbell, Home, Shirt, Baby, Store, Package, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, ShoppingCart, ShoppingBag, Globe, X, Tag, Sparkles, Flame, Laptop, Heart, Dumbbell, Home, Shirt, Baby, Store, Package, Loader2, Bell, CheckCheck, PackageCheck, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getCategories, searchProducts } from '@/lib/api';
 import { Category } from '@/types';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const pathname = usePathname();
@@ -23,7 +24,26 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const totalCartItems = useCartStore((state) => state.getTotalItems());
   const fetchCart = useCartStore((state) => state.fetchCart);
   const totalWishlistItems = useWishlistStore((state) => state.items.length);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
+  const isRinging = useNotificationStore((state) => state.isRinging);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const notifDropdownRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, loadUser } = useAuthStore();
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -269,6 +289,126 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
             )}
           </div>
           
+          {/* Notifications Bell with Dropdown */}
+          <div className="relative" ref={notifDropdownRef}>
+            <button
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              className="relative flex items-center p-1.5 rounded-full hover:bg-gray-100/70 transition-colors cursor-pointer group"
+              title={lang === 'ar' ? 'الإشعارات' : 'Notifications'}
+              aria-label="Notifications"
+            >
+              <motion.div
+                animate={isRinging ? {
+                  rotate: [0, -18, 18, -14, 14, -8, 8, -4, 4, 0],
+                  scale: [1, 1.25, 1.25, 1.15, 1.15, 1]
+                } : { rotate: 0, scale: 1 }}
+                transition={{ duration: 0.9, ease: 'easeInOut' }}
+                whileHover={{ scale: 1.1 }}
+              >
+                <Bell className={`w-6 h-6 transition-colors ${unreadNotificationsCount > 0 ? 'text-[#1a365d]' : 'text-gray-700'} group-hover:text-[#1a365d]`} />
+              </motion.div>
+              {mounted && unreadNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-md animate-pulse">
+                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Quick Dropdown Panel */}
+            <AnimatePresence>
+              {isNotificationsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                  transition={{ duration: 0.2 }}
+                  className={`absolute top-full mt-3 w-[calc(100vw-2rem)] max-w-[360px] sm:max-w-none sm:w-96 bg-white rounded-3xl shadow-[0_20px_50px_rgba(26,54,93,0.16)] border border-gray-100 p-4 z-50 ${
+                    lang === 'ar' ? 'left-0 sm:-left-2 right-auto' : 'right-0 sm:-right-2 left-auto'
+                  }`}
+                >
+                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-[#1a365d] text-base">
+                        {lang === 'ar' ? 'الإشعارات' : 'Notifications'}
+                      </span>
+                      {unreadNotificationsCount > 0 && (
+                        <span className="bg-[#1a365d] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                          {unreadNotificationsCount}
+                        </span>
+                      )}
+                    </div>
+
+                    {unreadNotificationsCount > 0 && (
+                      <button
+                        onClick={() => markAllAsRead()}
+                        className="text-xs font-bold text-[#1a365d] hover:text-blue-700 transition flex items-center gap-1"
+                      >
+                        <CheckCheck className="w-3.5 h-3.5" />
+                        <span>{lang === 'ar' ? 'قراءة الكل' : 'Mark all read'}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Dropdown Items List */}
+                  <div className="max-h-72 overflow-y-auto space-y-2 py-1 no-scrollbar">
+                    {notifications.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400">
+                        <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                        <p className="text-xs font-bold">{lang === 'ar' ? 'لا توجد إشعارات حالياً' : 'No notifications yet'}</p>
+                      </div>
+                    ) : (
+                      notifications.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            if (!item.read) markAsRead(item.id);
+                            if (item.link) {
+                              setIsNotificationsOpen(false);
+                              router.push(`/${lang}${item.link}`);
+                            }
+                          }}
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                            !item.read
+                              ? 'bg-blue-50/50 border-blue-100 hover:bg-blue-50'
+                              : 'bg-white border-gray-50 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <span className="text-base mt-0.5">
+                              {item.type === 'order' ? '📦' : item.type === 'offer' ? '✨' : '🔔'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs font-bold truncate ${!item.read ? 'text-[#1a365d]' : 'text-gray-800'}`}>
+                                {item.title}
+                              </p>
+                              <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">
+                                {item.message}
+                              </p>
+                            </div>
+                            {!item.read && (
+                              <span className="w-2 h-2 rounded-full bg-[#1a365d] mt-1 shrink-0" />
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Bottom Link to Full Notifications Center */}
+                  <div className="pt-3 mt-2 border-t border-gray-100 text-center">
+                    <Link
+                      href={`/${lang}/notifications`}
+                      onClick={() => setIsNotificationsOpen(false)}
+                      className="text-xs font-extrabold text-[#1a365d] hover:text-blue-700 transition block py-1.5"
+                    >
+                      {lang === 'ar' ? 'عرض كافة الإشعارات ←' : 'View all notifications →'}
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <Link href={`/${lang}/wishlist`} className="relative flex items-center group">
             <motion.div whileHover={{ scale: 1.1 }}>
               <Heart className="w-6 h-6 text-gray-700 group-hover:text-red-500 transition-colors" />

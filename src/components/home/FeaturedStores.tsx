@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { BadgeCheck, ArrowLeft, ArrowRight, Store as StoreIcon } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -74,9 +75,9 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
                       </div>
                     )}
                   </div>
-                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50 flex items-center justify-center text-gray-400 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
+                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50 flex items-center justify-center text-gray-400 relative ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
                     {store.logoUrl ? (
-                      <img src={store.logoUrl} alt={store.name} className="w-full h-full object-cover" />
+                      <Image src={store.logoUrl} alt={store.name} fill className="object-cover" sizes="56px" />
                     ) : (
                       <StoreIcon className="w-6 h-6" />
                     )}

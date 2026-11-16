@@ -1,11 +1,16 @@
 'use client';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/store/useCartStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import toast from 'react-hot-toast';
 
 export interface Product {
-  id: number;
+  id: string;
+  listingId: string;
   name: string;
   description: string;
   price: number;
@@ -24,10 +29,36 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
   const isAr = lang === 'ar';
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [adding, setAdding] = useState(false);
   const router = useRouter();
+  const { addItem } = useCartStore();
+  const { token } = useAuthStore();
 
   const handleCardClick = () => {
     router.push(`/${lang}/products/${product.id}`);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!token) {
+      toast.error(isAr ? 'يرجى تسجيل الدخول أولاً' : 'Please log in first');
+      router.push(`/${lang}/auth/login`);
+      return;
+    }
+
+    if (!product.inStock) return;
+
+    setAdding(true);
+    try {
+      await addItem(product.listingId, 1);
+      toast.success(isAr ? 'تمت الإضافة إلى السلة ✓' : 'Added to cart ✓');
+    } catch {
+      toast.error(isAr ? 'حدث خطأ، حاول مرة أخرى' : 'Error, please try again');
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
@@ -43,10 +74,12 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
     >
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
-        <img 
+        <Image 
           src={product.image} 
           alt={product.name} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         
         {/* Like Button */}
@@ -88,23 +121,23 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
           <div className="flex flex-col">
             <span className="text-sm text-gray-400 font-medium">{dict?.shopsPage?.shopDetails?.price}</span>
             <span className="text-xl font-extrabold text-[#1a365d]">
-              {product.price} <span className="text-sm">{dict?.shopsPage?.shopDetails?.currency}</span>
+              {product.price} <span className="text-sm">₪</span>
             </span>
           </div>
 
           <motion.button 
-            onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={handleAddToCart}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            disabled={!product.inStock}
+            disabled={!product.inStock || adding}
             className={`p-3 rounded-xl flex items-center justify-center transition-colors shadow-sm ${
-              product.inStock 
+              product.inStock && !adding
                 ? 'bg-[#1a365d] text-white hover:bg-blue-700' 
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}
             title={dict?.shopsPage?.shopDetails?.addToCart}
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className={`w-5 h-5 ${adding ? 'animate-pulse' : ''}`} />
           </motion.button>
         </div>
       </div>

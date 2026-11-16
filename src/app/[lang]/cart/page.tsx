@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useCartStore } from '@/store/useCartStore';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -21,8 +22,6 @@ export default function CartPage({ params }: { params: Promise<any> }) {
   if (!mounted) return <div className="min-h-screen bg-[#f8fafc] pt-20" />;
 
   const subtotal = getTotalPrice();
-  const shipping = items.length > 0 ? 15 : 0;
-  const total = subtotal + shipping;
 
   return (
     <div className="bg-[#f8fafc] min-h-screen pt-12 pb-20">
@@ -72,11 +71,13 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                       >
                         {/* Image */}
                         <Link href={`/${lang}/products/${item.listing.product._id}`}>
-                          <div className="w-24 h-24 rounded-2xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
-                            <img 
+                          <div className="w-24 h-24 rounded-2xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100 relative">
+                            <Image 
                               src={item.listing.product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
                               alt={isAr ? item.listing.product.nameAr : item.listing.product.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              sizes="96px"
                             />
                           </div>
                         </Link>
@@ -144,16 +145,17 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                     <span>{isAr ? 'المجموع الفرعي' : 'Subtotal'}</span>
                     <span className="font-bold text-gray-800">{subtotal} ₪</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>{isAr ? 'رسوم التوصيل' : 'Shipping'}</span>
-                    <span className="font-bold text-gray-800">{shipping} ₪</span>
+                  <div className="text-xs text-gray-400 bg-gray-50 rounded-lg p-3">
+                    {isAr
+                      ? '📦 رسوم التوصيل تُحسب لكل متجر عند إتمام الطلب حسب المنطقة.'
+                      : '📦 Delivery fee is calculated per shop at checkout based on your area.'}
                   </div>
                 </div>
                 
                 <div className="border-t border-gray-100 pt-4 mb-8">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-800">{isAr ? 'الإجمالي' : 'Total'}</span>
-                    <span className="text-2xl font-black text-[#1a365d]">{total} ₪</span>
+                    <span className="text-2xl font-black text-[#1a365d]">{subtotal} ₪</span>
                   </div>
                 </div>
 

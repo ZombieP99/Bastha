@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Star, Sparkles, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
@@ -56,10 +57,12 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
       {/* Image */}
       <Link href={`/${lang}/products/${product._id}`}>
         <div className="aspect-square rounded-xl overflow-hidden mb-4 relative bg-gray-50">
-          <img 
+          <Image 
             src={product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
             alt={isAr ? product.nameAr : product.name} 
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            fill
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
         </div>

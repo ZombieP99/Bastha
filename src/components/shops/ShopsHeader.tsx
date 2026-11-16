@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -18,10 +19,12 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
           className="lg:col-span-2 relative rounded-3xl overflow-hidden min-h-[400px] group"
         >
           <Link href={`/${lang}/shops/1`} className="flex items-end w-full h-full absolute inset-0">
-          <img 
+          <Image 
             src="https://picsum.photos/seed/perfume/1200/800" 
             alt="Perfume Store" 
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 1024px) 100vw, 66vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a365d]/90 via-[#1a365d]/40 to-transparent"></div>
           
@@ -56,10 +59,12 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] group"
           >
             <Link href={`/${lang}/shops/2`} className="flex items-end w-full h-full absolute inset-0">
-            <img 
+            <Image 
               src="https://picsum.photos/seed/decor/800/600" 
               alt="Home Decor" 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div className={`relative z-10 p-6 w-full text-white ${isAr ? 'text-right' : 'text-left'}`}>
@@ -80,10 +85,12 @@ export default function ShopsHeader({ dict, lang }: { dict: any; lang: string })
             className="flex-1 relative rounded-3xl overflow-hidden min-h-[190px] group"
           >
             <Link href={`/${lang}/shops/3`} className="flex items-end w-full h-full absolute inset-0">
-            <img 
+            <Image 
               src="https://picsum.photos/seed/watches/800/600" 
               alt="Watches" 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a365d]/90 to-transparent"></div>
             <div className={`relative z-10 p-6 w-full text-white ${isAr ? 'text-right' : 'text-left'}`}>

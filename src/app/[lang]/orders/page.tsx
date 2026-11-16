@@ -38,7 +38,7 @@ export default function OrdersPage({ params }: { params: Promise<any> }) {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('https://bastah-backend.onrender.com/api/orders', {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://bastah-backend.onrender.com/api'}/orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrders(res.data.orders || []);
@@ -161,9 +161,14 @@ export default function OrdersPage({ params }: { params: Promise<any> }) {
                         <StatusIcon className="w-4 h-4" />
                         <span>{getStatusLabel(order.status)}</span>
                       </div>
-                      <span className="text-sm text-gray-500 font-medium">
+                      <span className="text-sm text-gray-500 font-medium mb-1">
                         {order.deliveryMethod === 'delivery' ? (isAr ? 'توصيل للمنزل' : 'Home Delivery') : (isAr ? 'استلام من المتجر' : 'Store Pickup')}
                       </span>
+                      <Link href={`/${lang}/checkout/success?orders=${order._id}`}>
+                        <button className="text-xs bg-[#1a365d] text-white font-bold px-4 py-2 rounded-xl hover:bg-[#2b4c7e] shadow-sm transition-all hover:-translate-y-0.5">
+                          {isAr ? 'تتبع وتفاصيل الطلب' : 'Track Order Details'}
+                        </button>
+                      </Link>
                     </div>
                   </div>
 

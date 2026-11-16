@@ -72,7 +72,7 @@ export default function SuccessPage({ params }: { params: Promise<any> }) {
             <CheckCircle2 className="w-12 h-12 text-green-500" />
           </div>
           <h1 className="text-3xl font-extrabold text-[#1a365d] mb-4">
-            {isAr ? 'تم استلام طلباتك بنجاح!' : 'Orders received successfully!'}
+            {isAr ? 'تم تسجيل طلباتك بنجاح!' : 'Orders placed successfully!'}
           </h1>
           <p className="text-gray-500 text-lg max-w-xl mx-auto">
             {isAr 

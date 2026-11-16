@@ -92,7 +92,7 @@
       "reviews": "Reviews",
       "addToCart": "Add to Cart",
       "price": "Price",
-      "currency": "SAR",
+      "currency": "₪",
       "outOfStock": "Out of Stock",
       "searchProducts": "Search products..."
     },
@@ -167,5 +167,97 @@
     "sortRating": "Highest Rated",
     "applyFilters": "Apply Filters",
     "clearFilters": "Clear Filters"
+  },
+  "support": {
+    "pageTitle": "Support Center",
+    "pageSubtitle": "We are here to help anytime. Get in touch with us or browse our frequently asked questions.",
+    "contactTab": "Contact Us",
+    "faqTab": "FAQ",
+    "policiesTab": "Policies",
+    "contact": {
+      "title": "Send us a message",
+      "subtitle": "We will respond within 24 hours",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email Address",
+      "emailPlaceholder": "example@mail.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "How can we help you?",
+      "message": "Message",
+      "messagePlaceholder": "Write your message here...",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "success": "Your message has been sent successfully! We will get back to you soon.",
+      "error": "An error occurred. Please try again.",
+      "infoTitle": "Contact Information",
+      "emailLabel": "Email",
+      "emailValue": "support@bastah.com",
+      "phoneLabel": "Phone",
+      "phoneValue": "+970 59 000 0000",
+      "hoursLabel": "Business Hours",
+      "hoursValue": "Sunday – Thursday, 9 AM – 5 PM"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Answers to the most common questions",
+      "items": [
+        {
+          "q": "How do I add a product to the shopping cart?",
+          "a": "Find the product you want, click 'View Offers' to compare prices from different stores, then click 'Add to Cart' next to your preferred store."
+        },
+        {
+          "q": "How does payment work?",
+          "a": "Payment on Bastha is cash on delivery only. Electronic payment options are not currently supported. You pay the merchant directly upon receiving your order."
+        },
+        {
+          "q": "How long does delivery take?",
+          "a": "Delivery time depends on the individual store and your area. Delivery fees and times are determined separately by each store and shown during checkout."
+        },
+        {
+          "q": "Can I cancel my order?",
+          "a": "You can request order cancellation before the store confirms it. Go to 'My Orders' in your account and select the order to cancel."
+        },
+        {
+          "q": "How do I track my order?",
+          "a": "You can track your order status from 'My Orders' in your profile. You will also receive notifications whenever your order status changes."
+        },
+        {
+          "q": "How do I become a seller on Bastha?",
+          "a": "Click 'Sell with Bastha' in the navigation bar, create a merchant account, and submit your store details. Our team will review and approve your request."
+        }
+      ]
+    },
+    "policies": {
+      "title": "Our Policies",
+      "subtitle": "Read our policies carefully to understand your rights and responsibilities",
+      "privacy": {
+        "title": "Privacy Policy",
+        "content": "At Bastha, we respect your privacy and are committed to protecting your personal data. We only collect necessary information to run the service and improve your experience. We never sell your data to third parties. You have the right to request deletion of your account and data at any time."
+      },
+      "terms": {
+        "title": "Terms of Service",
+        "content": "By using the Bastha platform, you agree to the following terms: use the platform for legitimate purposes only, provide accurate information during registration, and respect other buyers and sellers. Bastha reserves the right to suspend any account that violates these terms."
+      },
+      "returns": {
+        "title": "Return Policy",
+        "content": "Buyers may request to return a product within 48 hours of receipt if it is damaged or does not match its description. Returns are coordinated directly with the respective merchant. Bastha mediates any disputes between buyer and seller."
+      }
+    }
+  },
+  "notifications": {
+    "pageTitle": "Notification Center",
+    "pageSubtitle": "Track your order updates in real-time, and stay informed on exclusive local deals.",
+    "all": "All",
+    "orders": "Order Updates",
+    "offers": "Deals & Offers",
+    "system": "System Alerts",
+    "unreadOnly": "Unread",
+    "markAllRead": "Mark all as read",
+    "clearAll": "Clear all",
+    "emptyTitle": "No notifications yet",
+    "emptyDesc": "We will notify you when there are updates on your orders or new discounts from local stores.",
+    "delete": "Delete notification",
+    "markAsRead": "Mark as read",
+    "unreadBadge": "New"
   }
 }

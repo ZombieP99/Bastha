@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Star, MapPin, Clock } from 'lucide-react';
 
 interface ShopDetailsHeaderProps {
@@ -11,11 +11,11 @@ interface ShopDetailsHeaderProps {
     rating: number;
     tags: string[];
   };
-  dict: any;
+  dict?: Record<string, unknown>;
   lang: string;
 }
 
-export default function ShopDetailsHeader({ shop, dict, lang }: ShopDetailsHeaderProps) {
+export default function ShopDetailsHeader({ shop, lang }: ShopDetailsHeaderProps) {
   const isAr = lang === 'ar';
 
   return (
@@ -24,8 +24,8 @@ export default function ShopDetailsHeader({ shop, dict, lang }: ShopDetailsHeade
         
         {/* Logo (Optional) */}
         {shop.logo ? (
-          <div className="w-32 h-32 md:w-48 md:h-48 rounded-full border border-gray-100 shadow-sm overflow-hidden bg-white flex-shrink-0">
-            <img src={shop.logo} alt={shop.name} className="w-full h-full object-cover" />
+          <div className="w-32 h-32 md:w-48 md:h-48 rounded-full border border-gray-100 shadow-sm overflow-hidden bg-white flex-shrink-0 relative">
+            <Image src={shop.logo} alt={shop.name} fill className="object-cover" sizes="192px" />
           </div>
         ) : (
           <div className="w-32 h-32 md:w-48 md:h-48 rounded-full border border-gray-100 shadow-sm bg-gradient-to-br from-[#1a365d] to-[#2b4c7e] flex items-center justify-center flex-shrink-0">

@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Globe, Share2, AtSign, CreditCard, Wallet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Globe, Share2, AtSign, Banknote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Footer({ dict, lang }: { dict: any, lang?: string }) {
@@ -35,7 +35,7 @@ export default function Footer({ dict, lang }: { dict: any, lang?: string }) {
             <h3 className="text-[#1a365d] font-bold mb-6">{dict?.footer?.quickLinks?.title}</h3>
             <ul className="flex flex-col gap-3 text-sm text-gray-500">
               <li><Link href={`/${lang}#about`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.about}</Link></li>
-              <li><Link href={`/${lang}#contact`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.contact}</Link></li>
+              <li><Link href={`/${lang}/support?tab=contact`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.contact}</Link></li>
               <li><Link href={`/${lang}/shops`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.stores}</Link></li>
               <li><Link href={`/${lang}#offers`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.quickLinks?.offers}</Link></li>
             </ul>
@@ -44,10 +44,10 @@ export default function Footer({ dict, lang }: { dict: any, lang?: string }) {
           <div>
             <h3 className="text-[#1a365d] font-bold mb-6">{dict?.footer?.legal?.title}</h3>
             <ul className="flex flex-col gap-3 text-sm text-gray-500">
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.privacy}</Link></li>
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.terms}</Link></li>
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.help}</Link></li>
-              <li><Link href="#" className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.faq}</Link></li>
+              <li><Link href={`/${lang}/support?tab=policies#privacy`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.privacy}</Link></li>
+              <li><Link href={`/${lang}/support?tab=policies#terms`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.terms}</Link></li>
+              <li><Link href={`/${lang}/support`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.help}</Link></li>
+              <li><Link href={`/${lang}/support?tab=faq`} className="hover:text-[#1a365d] hover:translate-x-1 transition-all inline-block">{dict?.footer?.legal?.faq}</Link></li>
             </ul>
           </div>
 
@@ -72,9 +72,9 @@ export default function Footer({ dict, lang }: { dict: any, lang?: string }) {
 
         <div className="border-t border-gray-100 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500 gap-4">
           <p>{dict?.footer?.copyright}</p>
-          <div className="flex items-center gap-4 text-gray-400">
-            <CreditCard className="w-5 h-5 hover:text-gray-600 transition-colors" />
-            <Wallet className="w-5 h-5 hover:text-gray-600 transition-colors" />
+          <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <Banknote className="w-5 h-5" />
+            <span>{isAr ? 'الدفع نقداً عند الاستلام' : 'Cash on delivery only'}</span>
           </div>
         </div>
       </div>

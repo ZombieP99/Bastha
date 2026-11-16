@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Star, ShoppingCart, Heart, Shield, Truck, RotateCcw, Share2, Store, CheckCircle, Loader2 } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Banknote, Truck, RotateCcw, Share2, Store, CheckCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
 import { useCartStore } from '@/store/useCartStore';
@@ -29,7 +30,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`https://bastah-backend.onrender.com/api/products/${productId}/listings`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://bastah-backend.onrender.com/api'}/products/${productId}/listings`);
         setData(res.data);
       } catch (err) {
         console.error(err);
@@ -122,15 +123,22 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
         {/* Product Images */}
         <div className="flex flex-col gap-4">
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-100 shadow-sm">
-            <motion.img 
+            <motion.div
               key={activeImage}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              src={product.images?.[activeImage] || product.imageUrl || 'https://via.placeholder.com/800'} 
-              alt={isAr ? product.nameAr : product.name} 
-              className="w-full h-full object-cover"
-            />
+              className="w-full h-full"
+            >
+              <Image
+                src={product.images?.[activeImage] || product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800'}
+                alt={isAr ? product.nameAr : product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+            </motion.div>
             <div className={`absolute top-4 ${isAr ? 'left-4' : 'right-4'} bg-white/90 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white transition hover:text-red-500 shadow-sm`}>
               <Heart className="w-5 h-5 text-gray-400 hover:fill-red-500 hover:text-red-500 transition" />
             </div>
@@ -139,12 +147,12 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
           {product.images && product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-4">
               {product.images.map((img: string, idx: number) => (
-                <button 
+                  <button 
                   key={idx}
                   onClick={() => setActiveImage(idx)}
                   className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-[#1a365d] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                 >
-                  <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                  <Image src={img} alt={`Thumbnail ${idx}`} fill className="object-cover" sizes="80px" />
                 </button>
               ))}
             </div>
@@ -216,15 +224,15 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
           <div className="grid grid-cols-3 gap-4 border-t border-b border-gray-100 py-6">
             <div className="flex flex-col items-center justify-center text-center gap-2">
               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#1a365d]">
-                <Shield className="w-5 h-5" />
+                <Banknote className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-gray-600">Secure Payment</span>
+              <span className="text-xs font-bold text-gray-600">الدفع نقداً / Cash Only</span>
             </div>
             <div className="flex flex-col items-center justify-center text-center gap-2">
               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#1a365d]">
                 <Truck className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-gray-600">Fast Delivery</span>
+              <span className="text-xs font-bold text-gray-600">توصيل محلي / Local Delivery</span>
             </div>
             <div className="flex flex-col items-center justify-center text-center gap-2">
               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#1a365d]">

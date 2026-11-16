@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Shop } from '@/types';
 import { MapPin, CheckCircle2 } from 'lucide-react';
 
@@ -18,10 +19,12 @@ export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: any; 
       <Link href={`/${lang}/shops/${shop._id}`} className="flex flex-col h-full cursor-pointer">
       {/* Cover Image & Rating */}
       <div className="relative h-48 overflow-hidden bg-gray-100">
-        <img 
+        <Image 
           src={shop.logoUrl || 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=800&q=80'} 
           alt={shop.name} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          sizes="(max-width: 768px) 100vw, 33vw"
         />
         {/* Rating Badge - Always top left based on design */}
         <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-xl font-bold text-sm text-[#1a365d] shadow-sm flex items-center gap-1 z-10">

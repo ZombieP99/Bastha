@@ -49,7 +49,7 @@ export default function AIPage({ params }: { params: Promise<any> }) {
     'How do I track my order?'
   ];
 
-  const handleSend = (text: string) => {
+  const handleSend = async (text: string) => {
     if (!text.trim()) return;
     
     const newUserMsg: Message = { id: Date.now().toString(), type: 'user', text };
@@ -57,26 +57,30 @@ export default function AIPage({ params }: { params: Promise<any> }) {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponses = isAr ? [
-        'عظيم! جاري البحث في آلاف المنتجات عبر منصتنا...',
-        'لقد وجدت بعض الخيارات الممتازة التي قد تنال إعجابك. سأعرضها لك الآن.',
-        'طلبك قيد المعالجة! بسطة توفر دائماً أفضل المتاجر المحلية بأفضل الأسعار.'
-      ] : [
-        'Great! Searching through thousands of products on our platform...',
-        'I found some excellent options you might like. Let me show them to you.',
-        'Processing your request! Bastha always provides the best local stores at the best prices.'
-      ];
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-      
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, lang }),
+      });
+
+      if (!response.ok) throw new Error('API error');
+
+      const data = await response.json();
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         type: 'ai',
-        text: randomResponse
+        text: data.reply || data.message || (isAr ? 'عذراً، لم أفهم طلبك. حاول مرة أخرى.' : 'Sorry, I did not understand. Please try again.'),
       }]);
+    } catch {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'ai',
+        text: isAr ? 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Sorry, something went wrong. Please try again.',
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (

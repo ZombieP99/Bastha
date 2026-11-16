@@ -21,6 +21,7 @@ export default async function ShopDetailsPage({
     const listings = await getShopProducts(shopId);
     products = listings.map((l: any) => ({
       id: l.product._id,
+      listingId: l._id,
       name: lang === 'ar' ? l.product.nameAr : l.product.name,
       description: l.product.description || '',
       price: l.price,
