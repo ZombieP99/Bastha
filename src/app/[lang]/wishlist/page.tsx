@@ -1,22 +1,20 @@
 'use client';
+import { useMounted } from '@/hooks/useMounted';
 
-import { use, useEffect, useState } from 'react';
-import { useWishlistStore } from '@/store/useWishlistStore';
-import { Heart, ShoppingBag } from 'lucide-react';
-import Link from 'next/link';
 import ProductCard from '@/components/products/ProductCard';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import { Heart } from 'lucide-react';
+import Link from 'next/link';
+import { use } from 'react';
 
-export default function WishlistPage({ params }: { params: Promise<any> }) {
+export default function WishlistPage({ params }: { params: Promise<{ lang: string }> }) {
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
   const isAr = lang === 'ar';
 
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const { items } = useWishlistStore();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) return <div className="min-h-screen bg-[#f8fafc] pt-20" />;
 

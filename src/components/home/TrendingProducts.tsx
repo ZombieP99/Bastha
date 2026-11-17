@@ -1,22 +1,27 @@
 'use client';
-import { Heart, ShoppingCart, Star, ChevronRight, ChevronLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import ProductCard from '@/components/products/ProductCard';
 import { getFeaturedProducts } from '@/lib/api';
 import { Product } from '@/types';
-import ProductCard from '@/components/products/ProductCard';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useEffect,useState } from 'react';
 
-export default function TrendingProducts({ dict, lang }: { dict: any, lang: string }) {
+export default function TrendingProducts({ dict, lang }: { dict: Dictionary, lang: string }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed,setFailed]=useState(false);
+  const [retry,setRetry]=useState(0);
 
   useEffect(() => {
+    let active=true;
     getFeaturedProducts(4).then((data) => {
+      if(!active)return;
       setProducts(data);
       setLoading(false);
-    }).catch(console.error);
-  }, []);
+    }).catch(()=>{if(active)setFailed(true);}).finally(() => {if(active)setLoading(false);});
+    return ()=>{active=false;};
+  }, [retry]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -31,6 +36,7 @@ export default function TrendingProducts({ dict, lang }: { dict: any, lang: stri
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
+  if(failed)return <div role="alert" className="container mx-auto px-4 py-8"><p>{lang==='ar'?'تعذر تحميل هذا القسم':'Unable to load this section'}</p><button onClick={()=>{setFailed(false);setLoading(true);setRetry(n=>n+1);}}>{lang==='ar'?'إعادة المحاولة':'Retry'}</button></div>;
   if (loading) {
     return <div className="container mx-auto px-4 py-12 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a365d]"></div></div>;
   }
@@ -44,14 +50,7 @@ export default function TrendingProducts({ dict, lang }: { dict: any, lang: stri
           <h2 className="text-3xl font-extrabold text-gray-800 mb-2">{dict.trending.title}</h2>
           <p className="text-gray-500 font-medium">{dict.trending.subtitle}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
-            {lang === 'ar' ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-          </button>
-          <button className="w-10 h-10 rounded-full bg-[#1a365d] flex items-center justify-center text-white hover:bg-[#2b4c7e] transition-colors shadow-md">
-            {lang === 'ar' ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-          </button>
-        </div>
+        <Link className="font-bold underline" href={`/${lang}/products`}>{lang==='ar'?'عرض الكل':'View all'}</Link>
       </div>
 
       <motion.div 

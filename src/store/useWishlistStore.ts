@@ -1,6 +1,7 @@
+import { Product } from '@/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Product } from '@/types';
+import { useAuthStore } from './useAuthStore';
 
 interface WishlistState {
   items: Product[];
@@ -31,3 +32,5 @@ export const useWishlistStore = create<WishlistState>()(
     }
   )
 );
+
+useAuthStore.subscribe((state,previous)=>{if(state.token!==previous.token)useWishlistStore.getState().clearWishlist();});

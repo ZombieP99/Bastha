@@ -1,8 +1,9 @@
 'use client';
-import Link from 'next/link';
+import type { Dictionary } from '@/types/dictionary';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
-export default function Hero({ dict, lang }: { dict: any, lang: string }) {
+export default function Hero({ dict, lang }: { dict: Dictionary, lang: string }) {
   return (
     <section className="container mx-auto px-4 md:px-8 py-8">
       <motion.div 

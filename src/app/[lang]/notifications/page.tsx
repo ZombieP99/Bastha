@@ -1,6 +1,6 @@
-import { Metadata } from 'next';
-import { getDictionary } from '@/i18n/dictionaries';
 import NotificationsView from '@/components/notifications/NotificationsView';
+import { getDictionary } from '@/i18n/dictionaries';
+import { Metadata } from 'next';
 
 export async function generateMetadata({
   params,

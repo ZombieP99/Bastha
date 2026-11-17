@@ -1,25 +1,22 @@
 'use client';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Heart, Star, Sparkles, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useMounted } from '@/hooks/useMounted';
 import { useWishlistStore } from '@/store/useWishlistStore';
+import type { Product } from '@/types';
+import { Heart,ShoppingCart,Sparkles,Star } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function ProductCard({ product, lang, isNew = false }: { product: any, lang: string, isNew?: boolean }) {
+export default function ProductCard({ product, lang, isNew = false }: { product: Product, lang: string, isNew?: boolean }) {
   const isAr = lang === 'ar';
   
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const toggleWishlistStore = useWishlistStore(state => state.toggleWishlist);
-  const isInWishlistStore = useWishlistStore(state => state.isInWishlist);
-  const isWishlisted = mounted ? isInWishlistStore(product._id) : false;
+  const wishlistItems = useWishlistStore(state => state.items);
+  const isWishlisted = mounted ? wishlistItems.some(item => item._id === product._id) : false;
 
   const router = useRouter();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -45,7 +42,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
       )}
       
       {/* Like Button */}
-      <button 
+      <button aria-label={isAr?'المفضلة':'Wishlist'} aria-pressed={isWishlisted}
         onClick={toggleWishlist}
         className={`absolute top-4 left-4 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-all shadow-sm ${
           isWishlisted ? 'text-red-500 bg-red-50 border border-red-100' : 'text-gray-400 hover:text-red-500 hover:bg-white'
@@ -83,7 +80,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
         <div className="flex items-center gap-2 mb-4 mt-auto">
           <div className="flex items-center gap-1 bg-yellow-50 px-1.5 py-0.5 rounded text-yellow-600">
             <Star className="w-3.5 h-3.5 fill-current" />
-            <span className="text-xs font-bold">5.0</span>
+            <span className="text-xs font-bold">?</span>
           </div>
           <span className="text-xs text-gray-400 font-medium">(0 {isAr ? 'تقييم' : 'reviews'})</span>
         </div>

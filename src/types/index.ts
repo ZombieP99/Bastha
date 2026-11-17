@@ -62,3 +62,12 @@ export interface PaginatedResponse<T> {
   total: number;
   data: T[]; // Helper field, actual response keys vary (e.g., 'products')
 }
+
+export interface Order {
+  _id: string; createdAt: string; status: string; deliveryMethod: 'pickup' | 'delivery';
+  shop: Shop; subtotal: number; deliveryFee: number; total: number;
+  contactPhone?: string; note?: string;
+  deliveryAddress?: { area?: { name: string; nameAr: string }; details?: string };
+  items: { productName: string; productNameAr: string; quantity: number; priceAtOrder: number }[];
+}
+export interface Review { _id: string; rating: number; comment?: string; author: { name: string }; createdAt: string }

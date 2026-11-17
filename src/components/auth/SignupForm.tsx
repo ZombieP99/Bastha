@@ -1,12 +1,13 @@
 'use client';
-import { useState } from 'react';
-import { Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { Loader2,Lock,Mail,Phone,User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface SignupFormProps {
-  dict: any;
+  dict: Dictionary;
   isAr: boolean;
   lang: string;
 }
@@ -32,7 +33,7 @@ export default function SignupForm({ dict, isAr, lang }: SignupFormProps) {
     try {
       await register(formData);
       router.push(`/${lang}`);
-    } catch (err) {
+    } catch {
       // Error is handled by store
     }
   };
@@ -47,12 +48,11 @@ export default function SignupForm({ dict, isAr, lang }: SignupFormProps) {
       
       <div className="space-y-4">
         <div>
-          <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+          <label htmlFor="signup-name" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
             {dict?.auth?.fullName}
           </label>
           <div className="relative">
-            <input
-              required
+            <input id="signup-name" required
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -64,12 +64,11 @@ export default function SignupForm({ dict, isAr, lang }: SignupFormProps) {
         </div>
 
         <div>
-          <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+          <label htmlFor="signup-phone" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
             {isAr ? 'رقم الهاتف' : 'Phone'}
           </label>
           <div className="relative">
-            <input
-              required
+            <input id="signup-phone" required
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -81,12 +80,11 @@ export default function SignupForm({ dict, isAr, lang }: SignupFormProps) {
         </div>
 
         <div>
-          <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+          <label htmlFor="signup-email" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
             {dict?.auth?.email}
           </label>
           <div className="relative">
-            <input
-              required
+            <input id="signup-email" required
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -98,12 +96,11 @@ export default function SignupForm({ dict, isAr, lang }: SignupFormProps) {
         </div>
 
         <div>
-          <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+          <label htmlFor="signup-password" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
             {dict?.auth?.password}
           </label>
           <div className="relative">
-            <input
-              required
+            <input id="signup-password" required
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}

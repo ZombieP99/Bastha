@@ -1,22 +1,28 @@
 'use client';
-import Image from 'next/image';
-import { BadgeCheck, ArrowLeft, ArrowRight, Store as StoreIcon } from 'lucide-react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 import { getTopShops } from '@/lib/api';
 import { Shop } from '@/types';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { ArrowLeft,ArrowRight,BadgeCheck,Store as StoreIcon } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect,useState } from 'react';
 
-export default function FeaturedStores({ dict, lang }: { dict: any, lang: string }) {
+export default function FeaturedStores({ dict, lang }: { dict: Dictionary, lang: string }) {
   const [stores, setStores] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed,setFailed]=useState(false);
+  const [retry,setRetry]=useState(0);
 
   useEffect(() => {
+    let active=true;
     getTopShops(3).then((data) => {
+      if(!active)return;
       setStores(data);
       setLoading(false);
-    }).catch(console.error);
-  }, []);
+    }).catch(()=>{if(active)setFailed(true);}).finally(() => {if(active)setLoading(false);});
+    return ()=>{active=false;};
+  }, [retry]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -31,6 +37,7 @@ export default function FeaturedStores({ dict, lang }: { dict: any, lang: string
     show: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
+  if(failed)return <div role="alert" className="container mx-auto px-4 py-8"><p>{lang==='ar'?'تعذر تحميل هذا القسم':'Unable to load this section'}</p><button onClick={()=>{setFailed(false);setLoading(true);setRetry(n=>n+1);}}>{lang==='ar'?'إعادة المحاولة':'Retry'}</button></div>;
   if (loading) {
     return <div className="container mx-auto px-4 py-12 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a365d]"></div></div>;
   }

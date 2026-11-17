@@ -1,11 +1,12 @@
 'use client';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import Image from 'next/image';
 import { Shop } from '@/types';
-import { MapPin, CheckCircle2 } from 'lucide-react';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { CheckCircle2,MapPin } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: any; lang: string }) {
+export default function ShopCard({ shop, dict, lang }: { shop: Shop; dict: Dictionary; lang: string }) {
   const isAr = lang === 'ar';
 
   return (

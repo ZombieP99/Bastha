@@ -1,13 +1,17 @@
 'use client';
+import AccountGate from '@/components/auth/AccountGate';
+import { useMounted } from '@/hooks/useMounted';
+import api from '@/lib/api';
+import { errorMessage } from '@/lib/errors';
+import type { CartItem } from '@/store/useCartStore';
 
-import { use, useState, useEffect, useMemo } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
+import { AnimatePresence,motion } from 'framer-motion';
+import { CheckCircle2,Info,ShieldCheck,Store,Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MapPin, Truck, Store, ShieldCheck, ArrowRight, ArrowLeft, CheckCircle2, Info } from 'lucide-react';
-import { useCartStore } from '@/store/useCartStore';
-import { useAuthStore } from '@/store/useAuthStore';
-import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import { use,useEffect,useMemo,useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface Area {
@@ -22,14 +26,18 @@ interface ShopDetails {
   deliveryZones?: { area: Area; fee: number }[];
 }
 
-export default function CheckoutPage({ params }: { params: Promise<any> }) {
+export default function CheckoutPage({ params }: { params: Promise<{ lang: string }> }) {
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
+  const sessionToken=useAuthStore(s=>s.token);
+  return <AccountGate lang={lang}><CheckoutContent key={sessionToken} lang={lang}/></AccountGate>;
+}
+function CheckoutContent({lang}:{lang:string}) {
   const isAr = lang === 'ar';
   const router = useRouter();
 
-  const [mounted, setMounted] = useState(false);
-  const { items, clearCart } = useCartStore();
+  const mounted = useMounted();
+  const { items, isLoading:cartLoading } = useCartStore();
   const token = useAuthStore((state) => state.token);
 
   const [areas, setAreas] = useState<Area[]>([]);
@@ -37,17 +45,19 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
   
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [formData, setFormData] = useState({
-    phone: '',
+    phone: useAuthStore.getState().user?.phone || '',
     areaId: '',
     details: '',
     note: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [dataError,setDataError]=useState('');
+  const [retry,setRetry]=useState(0);
 
   // Group items by shop
   const groupedByShop = useMemo(() => {
-    const groups: Record<string, { shop: any; items: any[]; subtotal: number }> = {};
+    const groups: Record<string, { shop: CartItem['listing']['shop']; items: CartItem[]; subtotal: number }> = {};
     items.forEach((item) => {
       const shopId = item.listing.shop._id;
       if (!groups[shopId]) {
@@ -60,19 +70,12 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
   }, [items]);
 
   useEffect(() => {
-    setMounted(true);
-    
-    // Auto-fill phone from user if possible
-    const user = useAuthStore.getState().user;
-    if (user && user.phone) {
-      setFormData(prev => ({ ...prev, phone: user.phone }));
-    }
-
+    let active=true;
     const fetchData = async () => {
       try {
         // 1. Fetch areas
-        const areasRes = await axios.get('https://bastah-backend.onrender.com/api/areas');
-        setAreas(areasRes.data.areas || []);
+        const areasRes = await api.get('/areas');
+        if(active)setAreas(areasRes.data.areas || []);
 
         // 2. Fetch full shop details for shops in cart to get deliveryZones
         const uniqueShopIds = Array.from(new Set(items.map(item => item.listing.shop._id)));
@@ -80,29 +83,30 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
         
         await Promise.all(uniqueShopIds.map(async (id) => {
           try {
-            const shopRes = await axios.get(`https://bastah-backend.onrender.com/api/shops/${id}`);
+            const shopRes = await api.get(`/shops/${id}`);
             detailsMap[id] = shopRes.data.shop;
           } catch (e) {
-            console.error(`Failed to fetch shop ${id}`, e);
+            throw e;
           }
         }));
         
-        setShopDetails(detailsMap);
+        if(active){setShopDetails(detailsMap);setDataError('');}
       } catch (err) {
-        console.error('Failed to load checkout data', err);
+        if(active)setDataError(errorMessage(err));
       } finally {
-        setIsLoadingData(false);
+        if(active)setIsLoadingData(false);
       }
     };
 
     if (items.length > 0) {
       fetchData();
     } else {
-      setIsLoadingData(false);
+      queueMicrotask(()=>{if(active)setIsLoadingData(false);});
     }
-  }, [items]);
+    return ()=>{active=false;};
+  }, [items,retry]);
 
-  if (!mounted || isLoadingData) return <div className="min-h-screen bg-[#f8fafc] pt-20 flex justify-center"><div className="animate-spin w-8 h-8 border-4 border-[#1a365d] border-t-transparent rounded-full"></div></div>;
+  if (!mounted || isLoadingData || cartLoading) return <div className="min-h-screen bg-[#f8fafc] pt-20 flex justify-center"><div className="animate-spin w-8 h-8 border-4 border-[#1a365d] border-t-transparent rounded-full"></div></div>;
 
   if (items.length === 0 && !isSubmitting) {
     return (
@@ -120,7 +124,7 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
   }
 
   // Calculate fees and validation for the current selected area
-  let canCheckout = true;
+  let canCheckout = (deliveryMethod==='pickup' || !dataError) && items.every(item=>item.listing.inStock);
   const shopSummaries = groupedByShop.map(group => {
     let fee = 0;
     let error = null;
@@ -128,8 +132,11 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
     if (deliveryMethod === 'delivery') {
       if (formData.areaId) {
         const shopInfo = shopDetails[group.shop._id];
-        if (shopInfo && shopInfo.deliveryZones) {
-          const zone = shopInfo.deliveryZones.find(z => z.area._id === formData.areaId);
+        if (!shopInfo?.deliveryZones) {
+          error = isAr ? 'تعذر التحقق من رسوم التوصيل' : 'Unable to verify delivery fees';
+          canCheckout = false;
+        } else {
+          const zone = shopInfo.deliveryZones.find(z => z.area?._id === formData.areaId);
           if (zone) {
             fee = zone.fee;
           } else {
@@ -152,7 +159,8 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
 
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canCheckout) return;
+    if (!canCheckout || isSubmitting) return;
+    if(!formData.phone.trim()){toast.error(isAr?'أدخل رقم الهاتف':'Enter a phone number');return;}
 
     if (!token) {
       toast.error(isAr ? 'يجب تسجيل الدخول لإتمام الطلب' : 'You must log in to checkout');
@@ -161,7 +169,7 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
 
     setIsSubmitting(true);
     try {
-      const payload: any = {
+      const payload: {contactPhone:string;note:string;deliveryMethod?:string;address?:{area:string;details:string}} = {
         contactPhone: formData.phone,
         note: formData.note
       };
@@ -174,18 +182,20 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
         };
       }
 
-      const res = await axios.post('https://bastah-backend.onrender.com/api/orders', payload, {
+      const res = await api.post<{orders:{_id:string}[]}>('/orders', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      const orderIds = res.data.orders.map((o: any) => o._id).join(',');
+      if(useAuthStore.getState().token!==token)return;
+      const orderIds = res.data.orders.map((o) => o._id).join(',');
       
       toast.success(isAr ? 'تم إرسال طلباتك بنجاح!' : 'Orders placed successfully!');
-      clearCart();
+      useCartStore.setState({ items: [], error: null, isLoading: false });
       router.push(`/${lang}/checkout/success?orders=${orderIds}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      if(useAuthStore.getState().token!==token)return;
       setIsSubmitting(false);
-      const msg = err.response?.data?.error || (isAr ? 'حدث خطأ أثناء الطلب' : 'Error placing order');
+      const msg = errorMessage(err);
       toast.error(msg);
       
       // If 409, some items might be unavailable, we should redirect back to cart if needed, but error message is enough for now.
@@ -194,6 +204,7 @@ export default function CheckoutPage({ params }: { params: Promise<any> }) {
 
   return (
     <div className="bg-[#f8fafc] min-h-screen pt-12 pb-20">
+      {dataError && <div role="alert" className="p-6 text-red-700"><p>{dataError}</p><button onClick={()=>{setIsLoadingData(true);setRetry(v=>v+1);}}>{isAr?'إعادة المحاولة':'Retry'}</button></div>}
       <div className="container mx-auto px-4 md:px-8 max-w-6xl">
         <div className="flex items-center gap-3 mb-10">
           <ShieldCheck className="w-8 h-8 text-[#1a365d]" />

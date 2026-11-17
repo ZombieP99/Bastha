@@ -1,25 +1,27 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Search, ShoppingCart, ShoppingBag, Globe, X, Tag, Sparkles, Flame, Laptop, Heart, Dumbbell, Home, Shirt, Baby, Store, Package, Loader2, Bell, CheckCheck, PackageCheck, Clock } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { getCategories, searchProducts } from '@/lib/api';
-import { Category } from '@/types';
-import { useCartStore } from '@/store/useCartStore';
-import { useWishlistStore } from '@/store/useWishlistStore';
+import { useMounted } from '@/hooks/useMounted';
+import { getCategories,searchProducts } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import { Category } from '@/types';
+import type { Dictionary } from '@/types/dictionary';
+import { AnimatePresence,motion } from 'framer-motion';
+import { Bell,CheckCheck,Globe,Heart,Loader2,Package,Search,ShoppingBag,ShoppingCart,Tag,X } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname,useRouter } from 'next/navigation';
+import { useEffect,useRef,useState } from 'react';
 
-export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
+export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [liveSuggestions, setLiveSuggestions] = useState<any[]>([]);
+  const [liveSuggestions, setLiveSuggestions] = useState<{name:string;type:'product'|'shop'}[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   const totalCartItems = useCartStore((state) => state.getTotalItems());
   const fetchCart = useCartStore((state) => state.fetchCart);
@@ -46,14 +48,14 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   }, []);
 
   useEffect(() => {
-    setMounted(true);
+
     loadUser(); // Load user on mount if token exists
   }, [loadUser]);
 
   // Fetch cart when authenticated state changes
   useEffect(() => {
     if (isAuthenticated) {
-      fetchCart();
+      void fetchCart().catch(()=>{});
     }
   }, [isAuthenticated, fetchCart]);
 
@@ -64,18 +66,19 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   // Debounced search
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setLiveSuggestions([]);
       return;
     }
+    let active=true;
     const timer = setTimeout(() => {
       setIsSearching(true);
       searchProducts(searchQuery, undefined, undefined, 1, 5)
         .then((data) => {
-          setLiveSuggestions(data.products.map((p: any) => ({ name: lang === 'ar' ? p.nameAr : p.name, type: 'product' })));
+          if(active)setLiveSuggestions(data.products.map((p) => ({ name: lang === 'ar' ? p.nameAr : p.name, type: 'product' })));
         })
-        .finally(() => setIsSearching(false));
+        .catch(() => {if(active)setLiveSuggestions([]);})
+        .finally(() => {if(active)setIsSearching(false);});
     }, 300);
-    return () => clearTimeout(timer);
+    return () => {active=false;clearTimeout(timer);};
   }, [searchQuery, lang]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -89,7 +92,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
   const toggleLanguage = () => {
     const newLang = lang === 'ar' ? 'en' : 'ar';
     const newPathname = pathname.replace(`/${lang}`, `/${newLang}`);
-    router.push(newPathname || `/${newLang}`);
+    router.push((newPathname || `/${newLang}`) + window.location.search + window.location.hash);
   };
 
   const isActive = (path: string) => {
@@ -135,7 +138,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {setSearchQuery(e.target.value);setLiveSuggestions([]);}}
                 onFocus={() => setIsSearchFocused(true)}
                 placeholder={dict.common.searchPlaceholder}
                 className={`w-full bg-[#f0f4f8] text-sm rounded-full py-3 px-12 outline-none border border-transparent focus:bg-white focus:shadow-md focus:border-[#1a365d] transition-all`}
@@ -194,7 +197,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
                         ))}
                       </div>
                     ) : (
-                       <p className="text-gray-500 text-sm">{lang === 'ar' ? 'لا يوجد مقترحات لـ' : 'No suggestions for'} "{searchQuery}"</p>
+                       <p className="text-gray-500 text-sm">{lang === 'ar' ? 'لا يوجد مقترحات لـ' : 'No suggestions for'} &quot;{searchQuery}&quot;</p>
                     )}
                   </div>
                 ) : (
@@ -340,7 +343,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
 
                     {unreadNotificationsCount > 0 && (
                       <button
-                        onClick={() => markAllAsRead()}
+                        onClick={() => { void markAllAsRead().catch(() => {}); }}
                         className="text-xs font-bold text-[#1a365d] hover:text-blue-700 transition flex items-center gap-1"
                       >
                         <CheckCheck className="w-3.5 h-3.5" />
@@ -361,7 +364,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
                         <div
                           key={item.id}
                           onClick={() => {
-                            if (!item.read) markAsRead(item.id);
+                            if (!item.read) void markAsRead(item.id).catch(() => {});
                             if (item.link) {
                               setIsNotificationsOpen(false);
                               router.push(`/${lang}${item.link}`);
@@ -409,7 +412,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
             </AnimatePresence>
           </div>
 
-          <Link href={`/${lang}/wishlist`} className="relative flex items-center group">
+          <Link aria-label={lang === 'ar' ? 'المفضلة' : 'Wishlist'} href={`/${lang}/wishlist`} className="relative flex items-center group">
             <motion.div whileHover={{ scale: 1.1 }}>
               <Heart className="w-6 h-6 text-gray-700 group-hover:text-red-500 transition-colors" />
             </motion.div>
@@ -420,7 +423,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
             )}
           </Link>
 
-          <Link href={`/${lang}/cart`} className="relative flex items-center group">
+          <Link aria-label={lang === 'ar' ? 'السلة' : 'Cart'} href={`/${lang}/cart`} className="relative flex items-center group">
             <motion.div whileHover={{ scale: 1.1 }}>
               <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-[#1a365d] transition-colors" />
             </motion.div>
@@ -433,6 +436,19 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
         </div>
       </div>
 
+      <div className="md:hidden border-t p-3 space-y-3">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <input aria-label={lang === 'ar' ? 'بحث المنتجات' : 'Search products'} value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);setLiveSuggestions([]);}} className="min-w-0 flex-1 rounded-xl bg-slate-100 p-3" placeholder={dict.common.searchPlaceholder}/>
+          <button type="submit" className="rounded-xl bg-[#1a365d] text-white px-4">{lang==='ar'?'بحث' : 'Search'}</button>
+        </form>
+        <nav aria-label={lang==='ar'?'التنقل الرئيسي' : 'Main navigation'} className="flex flex-wrap gap-4 text-sm font-bold">
+          <Link href={`/${lang}/products`}>{lang==='ar'?'المنتجات' : 'Products'}</Link>
+          <Link href={`/${lang}/shops`}>{lang==='ar'?'المتاجر' : 'Shops'}</Link>
+          <Link href={`/${lang}/${isAuthenticated ? user?.role === 'customer' ? 'profile' : 'seller/dashboard' : 'auth'}`}>{lang==='ar'?'حسابي' : 'Account'}</Link>
+          <Link href={`/${lang}/orders`}>{lang==='ar'?'طلباتي' : 'Orders'}</Link>
+          <Link href={`/${lang}/support`}>{lang==='ar'?'الدعم' : 'Support'}</Link>
+        </nav>
+      </div>
       {/* Bottom Nav (Categories) */}
       <div className="bg-[#f8fafc] border-t border-gray-100 hidden md:block">
         <div className="container mx-auto px-4 md:px-8 py-3 flex items-center justify-between text-sm font-semibold">
@@ -444,7 +460,7 @@ export default function Navbar({ dict, lang }: { dict: any, lang: string }) {
           
           <div className="flex items-center gap-4">
             <div className="w-px h-5 bg-gray-300"></div>
-            <Link href="#" className="text-[#846b2b] hover:text-[#a38024] font-bold flex items-center gap-2 group">
+            <Link href={`/${lang}/seller/login`} className="text-[#846b2b] hover:text-[#a38024] font-bold flex items-center gap-2 group">
               <span className="group-hover:-translate-y-0.5 transition-transform">{dict.nav.sellWithUs}</span>
             </Link>
           </div>

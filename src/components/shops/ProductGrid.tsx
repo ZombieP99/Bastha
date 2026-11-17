@@ -1,17 +1,17 @@
 'use client';
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, PackageOpen } from 'lucide-react';
-import ProductCard, { Product } from './ProductCard';
+import type { Dictionary } from '@/types/dictionary';
+import { AnimatePresence,motion } from 'framer-motion';
+import { PackageOpen } from 'lucide-react';
+import { useMemo,useState } from 'react';
+import ProductCard,{ Product } from './ProductCard';
 
 interface ProductGridProps {
   products: Product[];
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 
 export default function ProductGrid({ products, dict, lang }: ProductGridProps) {
-  const isAr = lang === 'ar';
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredProducts = useMemo(() => {
@@ -29,6 +29,7 @@ export default function ProductGrid({ products, dict, lang }: ProductGridProps) 
 
   return (
     <div className="w-full">
+      <label className="block mb-6">{lang==='ar'?'البحث في منتجات المتجر':'Search shop products'}<input className="block border rounded-xl p-3 w-full mt-2" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}/></label>
 
 
       {/* Grid */}

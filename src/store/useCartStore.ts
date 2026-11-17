@@ -1,5 +1,6 @@
+import api from '@/lib/api';
+import { errorMessage } from '@/lib/errors';
 import { create } from 'zustand';
-import axios from 'axios';
 import { useAuthStore } from './useAuthStore';
 
 // Matches the backend "populated cart shape"
@@ -29,19 +30,10 @@ interface CartState {
   getTotalPrice: () => number;
 }
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://bastah-backend.onrender.com/api',
-});
 
-// Interceptor to attach token
-api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
+function availableItems(items: CartItem[]): CartItem[] {
+ return items.filter(item=>item.listing && item.listing.product && item.listing.shop);
+}
 export const useCartStore = create<CartState>()((set, get) => ({
   items: [],
   isLoading: false,
@@ -54,14 +46,18 @@ export const useCartStore = create<CartState>()((set, get) => ({
       return;
     }
     
+    if (get().isLoading) throw new Error('Please wait for the current cart update');
+    const requestToken = useAuthStore.getState().token;
     set({ isLoading: true, error: null });
     try {
       const res = await api.get('/cart');
-      set({ items: res.data.cart.items || [], isLoading: false });
-    } catch (err: any) {
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+    } catch (err: unknown) {
+      if (useAuthStore.getState().token !== requestToken) return;
       console.error('Failed to fetch cart', err);
       // In case of 401 or 404, we just treat it as empty
-      set({ items: [], isLoading: false, error: err.response?.data?.error || 'Failed to fetch cart' });
+      set({ items: [], isLoading: false, error: errorMessage(err, 'Failed to fetch cart') });
     }
   },
 
@@ -71,47 +67,67 @@ export const useCartStore = create<CartState>()((set, get) => ({
       throw new Error('You must be logged in to add to cart');
     }
 
+    if (get().isLoading) throw new Error('Please wait for the current cart update');
+    const requestToken = useAuthStore.getState().token;
     set({ isLoading: true, error: null });
     try {
       const res = await api.post('/cart/items', { listing: listingId, quantity });
-      set({ items: res.data.cart.items || [], isLoading: false });
-    } catch (err: any) {
-      set({ isLoading: false, error: err.response?.data?.error || 'Failed to add item' });
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+    } catch (err: unknown) {
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ isLoading: false, error: errorMessage(err, 'Failed to add item') });
       throw err;
     }
   },
 
   removeItem: async (listingId: string) => {
+    if (get().isLoading) throw new Error('Please wait for the current cart update');
+    const requestToken = useAuthStore.getState().token;
     set({ isLoading: true, error: null });
     try {
       const res = await api.delete(`/cart/items/${listingId}`);
-      set({ items: res.data.cart.items || [], isLoading: false });
-    } catch (err: any) {
-      set({ isLoading: false, error: err.response?.data?.error || 'Failed to remove item' });
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+    } catch (err: unknown) {
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ isLoading: false, error: errorMessage(err, 'Failed to remove item') });
     }
   },
 
   updateQuantity: async (listingId: string, quantity: number) => {
     if (quantity < 1) return;
+    if (get().isLoading) throw new Error('Please wait for the current cart update');
+    const requestToken = useAuthStore.getState().token;
     set({ isLoading: true, error: null });
     try {
       const res = await api.patch(`/cart/items/${listingId}`, { quantity });
-      set({ items: res.data.cart.items || [], isLoading: false });
-    } catch (err: any) {
-      set({ isLoading: false, error: err.response?.data?.error || 'Failed to update quantity' });
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+    } catch (err: unknown) {
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ isLoading: false, error: errorMessage(err, 'Failed to update quantity') });
     }
   },
 
   clearCart: async () => {
+    if (get().isLoading) throw new Error('Please wait for the current cart update');
+    const requestToken = useAuthStore.getState().token;
     set({ isLoading: true, error: null });
     try {
       const res = await api.delete('/cart');
-      set({ items: res.data.cart.items || [], isLoading: false });
-    } catch (err: any) {
-      set({ isLoading: false, error: err.response?.data?.error || 'Failed to clear cart' });
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+    } catch (err: unknown) {
+      if (useAuthStore.getState().token !== requestToken) return;
+      set({ isLoading: false, error: errorMessage(err, 'Failed to clear cart') });
     }
   },
 
-  getTotalItems: () => get().items.length,
+  getTotalItems: () => get().items.reduce((sum,item)=>sum+item.quantity,0),
   getTotalPrice: () => get().items.reduce((total, item) => total + (item.listing.price * item.quantity), 0),
 }));
+
+useAuthStore.subscribe((state, previous) => {
+  if (state.token !== previous.token) useCartStore.setState({ items: [], error: null, isLoading: false });
+});

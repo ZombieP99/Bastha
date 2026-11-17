@@ -1,13 +1,14 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Zap, HeadphonesIcon } from 'lucide-react';
+import type { Dictionary } from '@/types/dictionary';
+import { AnimatePresence,motion } from 'framer-motion';
+import { HeadphonesIcon,ShieldCheck,Zap } from 'lucide-react';
+import { useState } from 'react';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import SocialLogin from './SocialLogin';
 
 interface AuthContainerProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   initialMode?: 'login' | 'signup';
 }
@@ -16,9 +17,7 @@ export default function AuthContainer({ dict, lang, initialMode = 'login' }: Aut
   const isAr = lang === 'ar';
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
 
-  useEffect(() => {
-    setIsLogin(initialMode === 'login');
-  }, [initialMode]);
+
 
   // We will use Framer Motion's layout animations to swap the panels simply by changing the flex direction
   const flexDir = isLogin ? (isAr ? 'md:flex-row-reverse' : 'md:flex-row') : (isAr ? 'md:flex-row' : 'md:flex-row-reverse');
@@ -109,7 +108,7 @@ export default function AuthContainer({ dict, lang, initialMode = 'login' }: Aut
               </motion.div>
             </AnimatePresence>
 
-            <SocialLogin dict={dict} />
+            <SocialLogin />
 
             {/* Toggle Button */}
             <div className="mt-8 text-center">

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const locales = ['ar', 'en'];
 const defaultLocale = 'ar';
@@ -20,6 +20,6 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip all internal paths (_next, assets, api)
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api(?:/|$)|_next(?:/|$)|favicon.ico|robots.txt|sitemap.xml|.*\\.[^/]+$).*)',
   ],
 };

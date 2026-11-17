@@ -1,23 +1,21 @@
 'use client';
+import { useMounted } from '@/hooks/useMounted';
 
-import { use, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useCartStore } from '@/store/useCartStore';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, ArrowLeft } from 'lucide-react';
+import { AnimatePresence,motion } from 'framer-motion';
+import { ArrowLeft,ArrowRight,Minus,Plus,ShoppingBag,Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { use } from 'react';
 
-export default function CartPage({ params }: { params: Promise<any> }) {
+export default function CartPage({ params }: { params: Promise<{ lang: string }> }) {
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
   const isAr = lang === 'ar';
 
-  const [mounted, setMounted] = useState(false);
-  const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
+  const mounted = useMounted();
+  const { items, removeItem, updateQuantity, getTotalPrice, isLoading, error, clearCart } = useCartStore();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) return <div className="min-h-screen bg-[#f8fafc] pt-20" />;
 
@@ -34,6 +32,8 @@ export default function CartPage({ params }: { params: Promise<any> }) {
           </h1>
         </div>
 
+        <button disabled={isLoading} className="underline mb-4" onClick={()=>{if(confirm(isAr?'إفراغ السلة؟':'Clear cart?'))void clearCart().catch(()=>{});}}>{isAr?'إفراغ السلة':'Clear cart'}</button>
+        {error && <p role="alert" className="text-red-700 p-4">{error}</p>}
         {items.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100 flex flex-col items-center">
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
@@ -100,7 +100,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                         {/* Actions */}
                         <div className="flex flex-col sm:items-end gap-4 w-full sm:w-auto">
                           <button 
-                            onClick={() => removeItem(item.listing._id)}
+                            disabled={isLoading} onClick={() => { void removeItem(item.listing._id).catch(()=>{}); }}
                             className="text-gray-400 hover:text-red-500 transition-colors p-2 self-end sm:self-auto"
                             title={isAr ? 'حذف' : 'Remove'}
                           >
@@ -109,8 +109,8 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                           
                           <div className="flex items-center justify-between sm:justify-start gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
                             <button 
-                              onClick={() => updateQuantity(item.listing._id, item.quantity - 1)}
-                              disabled={item.quantity <= 1}
+                              onClick={() => { void updateQuantity(item.listing._id, item.quantity - 1).catch(()=>{}); }}
+                              disabled={isLoading || item.quantity <= 1}
                               className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm disabled:opacity-50 hover:bg-gray-100 transition-colors"
                             >
                               <Minus className="w-4 h-4" />
@@ -119,7 +119,7 @@ export default function CartPage({ params }: { params: Promise<any> }) {
                               {item.quantity}
                             </span>
                             <button 
-                              onClick={() => updateQuantity(item.listing._id, item.quantity + 1)}
+                              disabled={isLoading} onClick={() => { void updateQuantity(item.listing._id, item.quantity + 1).catch(()=>{}); }}
                               className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm hover:bg-gray-100 transition-colors"
                             >
                               <Plus className="w-4 h-4" />

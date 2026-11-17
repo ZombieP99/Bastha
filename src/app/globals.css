@@ -6,8 +6,8 @@
   --color-secondary: #e2e8f0; /* light blue/gray background */
   --color-accent: #eab308; /* yellow accent */
   --color-olive: #6b705c; /* start selling button */
-  --font-tajawal: var(--font-tajawal), system-ui, sans-serif;
-  --font-inter: var(--font-inter), system-ui, sans-serif;
+  --font-tajawal: var(--font-tajawal-source), system-ui, sans-serif;
+  --font-inter: var(--font-inter-source), system-ui, sans-serif;
 }
 
 @layer base {
@@ -25,3 +25,10 @@
     scrollbar-width: none;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+button:not(:disabled), a, select { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+:focus-visible { outline: 3px solid #a38024; outline-offset: 3px; }

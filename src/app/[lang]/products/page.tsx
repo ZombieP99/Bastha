@@ -1,8 +1,7 @@
-import { getDictionary } from '@/i18n/dictionaries';
-import { getNewProducts } from '@/lib/api';
-import Link from 'next/link';
-import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/products/ProductCard';
+import { getNewProducts } from '@/lib/api';
+import { ChevronLeft,ChevronRight,Package } from 'lucide-react';
+import Link from 'next/link';
 
 const PAGE_SIZE = 20;
 
@@ -10,17 +9,16 @@ export default async function ProductsPage({
   params,
   searchParams,
 }: {
-  params: Promise<any>;
+  params: Promise<{ lang: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = await searchParams;
 
   const lang = resolvedParams.lang as 'en' | 'ar';
-  const dict = await getDictionary(lang);
   const isAr = lang === 'ar';
 
-  const currentPage = Math.max(1, parseInt(resolvedSearch.page || '1', 10));
+  const currentPage = Math.max(1, parseInt(resolvedSearch.page || '1', 10) || 1);
 
   // Fetch paginated products from API
   const data = await getNewProducts(currentPage, PAGE_SIZE);
@@ -55,7 +53,7 @@ export default async function ProductsPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product: any) => (
+            {products.map((product) => (
               <div key={product._id}>
                 <ProductCard product={product} lang={lang} />
               </div>

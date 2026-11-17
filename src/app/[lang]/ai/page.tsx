@@ -1,9 +1,10 @@
 'use client';
 
-import { use, useState, useRef, useEffect } from 'react';
-import { Bot, Send, User, Sparkles, ShoppingBag, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '@/store/useAuthStore';
+import { AnimatePresence,motion } from 'framer-motion';
+import { Bot,Send,ShoppingBag,Sparkles,User } from 'lucide-react';
 import Link from 'next/link';
+import { use,useEffect,useRef,useState } from 'react';
 
 interface Message {
   id: string;
@@ -11,7 +12,7 @@ interface Message {
   text: string;
 }
 
-export default function AIPage({ params }: { params: Promise<any> }) {
+export default function AIPage({ params }: { params: Promise<{ lang: string }> }) {
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
   const isAr = lang === 'ar';
@@ -22,9 +23,9 @@ export default function AIPage({ params }: { params: Promise<any> }) {
     {
       id: '1',
       type: 'ai',
-      text: isAr 
-        ? 'مرحباً! أنا المساعد الذكي الخاص ببسطة 🤖. يمكنني مساعدتك في البحث عن أفضل المنتجات، ومقارنة الأسعار، واقتراح هدايا مناسبة. كيف يمكنني مساعدتك اليوم؟' 
-        : "Hello! I am Bastha's smart assistant 🤖. I can help you find the best products, compare prices, and suggest great gifts. How can I help you today?"
+      text: isAr
+        ? 'مرحباً! أساعدك في استخدام بسطة والوصول إلى المنتجات والطلبات. لا أطلع على الأسعار أو المخزون أو بيانات طلباتك مباشرة.'
+        : "Hello! I can explain how to use Bastha and find products and orders. I do not have live prices, inventory, or access to your orders."
     }
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -39,20 +40,22 @@ export default function AIPage({ params }: { params: Promise<any> }) {
 
   const quickActions = isAr ? [
     'أبحث عن حذاء رياضي مريح',
-    'ما هي أفضل العروض اليوم؟',
+    'كيف أقارن عروض المتاجر؟',
     'أريد هدية لصديقي بحدود 100 شيكل',
     'كيف أتتبع طلبي؟'
   ] : [
     'Looking for comfortable sneakers',
-    "What are today's best deals?",
+    "How do I compare shop offers?",
     'Need a gift for a friend under 100 NIS',
     'How do I track my order?'
   ];
 
   const handleSend = async (text: string) => {
-    if (!text.trim()) return;
-    
-    const newUserMsg: Message = { id: Date.now().toString(), type: 'user', text };
+    if (!text.trim() || isTyping) return;
+    const token=useAuthStore.getState().token;
+    if(!token){setMessages(prev=>[...prev,{id:crypto.randomUUID(),type:'ai',text:isAr?'سجل الدخول لاستخدام المساعد':'Please log in to use the assistant'}]);return;}
+
+    const newUserMsg: Message = { id: crypto.randomUUID(), type: 'user', text };
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
@@ -60,21 +63,22 @@ export default function AIPage({ params }: { params: Promise<any> }) {
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify({ message: text, lang }),
+        signal: AbortSignal.timeout(35000),
       });
 
       if (!response.ok) throw new Error('API error');
 
       const data = await response.json();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         type: 'ai',
-        text: data.reply || data.message || (isAr ? 'عذراً، لم أفهم طلبك. حاول مرة أخرى.' : 'Sorry, I did not understand. Please try again.'),
+        text: data.text || (isAr ? 'عذراً، لم أفهم طلبك. حاول مرة أخرى.' : 'Sorry, I did not understand. Please try again.'),
       }]);
     } catch {
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         type: 'ai',
         text: isAr ? 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Sorry, something went wrong. Please try again.',
       }]);
@@ -85,9 +89,9 @@ export default function AIPage({ params }: { params: Promise<any> }) {
 
   return (
     <div className="bg-[#f0f4f8] min-h-screen pt-8 pb-8 flex flex-col h-[calc(100vh-64px)] lg:h-[calc(100vh-80px)]">
-      
+
       <div className="container mx-auto px-4 max-w-4xl flex-1 flex flex-col relative z-10 h-full">
-        
+
         {/* Header */}
         <div className="bg-white rounded-t-3xl p-6 shadow-sm border border-gray-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
@@ -123,7 +127,7 @@ export default function AIPage({ params }: { params: Promise<any> }) {
           <div className="space-y-6">
             <AnimatePresence>
               {messages.map((msg) => (
-                <motion.div 
+                <motion.div
                   key={msg.id}
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -139,10 +143,10 @@ export default function AIPage({ params }: { params: Promise<any> }) {
                         <User className="w-5 h-5 text-gray-500" />
                       </div>
                     )}
-                    
+
                     <div className={`p-4 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
-                      msg.type === 'user' 
-                        ? 'bg-[#1a365d] text-white rounded-tl-none rtl:rounded-tl-2xl rtl:rounded-tr-none' 
+                      msg.type === 'user'
+                        ? 'bg-[#1a365d] text-white rounded-tl-none rtl:rounded-tl-2xl rtl:rounded-tr-none'
                         : 'bg-white text-gray-800 border border-gray-100 rounded-tr-none rtl:rounded-tr-2xl rtl:rounded-tl-none'
                     }`}>
                       {msg.text}
@@ -153,7 +157,7 @@ export default function AIPage({ params }: { params: Promise<any> }) {
             </AnimatePresence>
 
             {isTyping && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex justify-start"
@@ -176,11 +180,11 @@ export default function AIPage({ params }: { params: Promise<any> }) {
 
         {/* Input Area */}
         <div className="bg-white rounded-b-3xl p-4 sm:p-6 shadow-[0_-10px_30px_rgba(0,0,0,0.02)] border border-gray-100 shrink-0">
-          
+
           {/* Quick Actions */}
           <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-2">
             {quickActions.map((action, idx) => (
-              <button 
+              <button
                 key={idx}
                 onClick={() => handleSend(action)}
                 className="whitespace-nowrap bg-gray-50 hover:bg-[#eaf1f8] hover:text-[#1a365d] text-gray-600 text-sm font-bold px-4 py-2 rounded-full border border-gray-100 transition-colors"
@@ -190,31 +194,31 @@ export default function AIPage({ params }: { params: Promise<any> }) {
             ))}
           </div>
 
-          <form 
+          <form
             onSubmit={(e) => { e.preventDefault(); handleSend(input); }}
             className="flex items-center gap-3 bg-gray-50 p-2 rounded-2xl border border-gray-200 focus-within:border-[#1a365d] focus-within:ring-2 focus-within:ring-[#1a365d]/20 transition-all"
           >
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isAr ? 'اسألني عن أي منتج...' : 'Ask me about any product...'}
+              maxLength={2000} placeholder={isAr ? 'سؤال عام عن استخدام المنصة...' : 'Ask about using the platform...'}
               className="flex-1 bg-transparent px-4 py-3 focus:outline-none text-gray-800"
               disabled={isTyping}
             />
-            <button 
+            <button
               type="submit"
               disabled={!input.trim() || isTyping}
               className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all shadow-md ${
-                !input.trim() || isTyping 
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                !input.trim() || isTyping
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-[#1a365d] text-white hover:bg-[#2b4c7e] hover:scale-105'
               }`}
             >
               <Send className={`w-5 h-5 ${isAr ? 'rotate-180' : ''}`} />
             </button>
           </form>
-          
+
           <p className="text-center text-xs text-gray-400 mt-4">
             {isAr ? 'بسطة AI قد يخطئ أحياناً، يرجى التأكد من المعلومات.' : 'Bastha AI can make mistakes. Consider verifying important info.'}
           </p>

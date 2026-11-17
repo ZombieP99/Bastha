@@ -1,13 +1,13 @@
 'use client';
 
-import { use, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, Store, Loader2, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
+import { motion } from 'framer-motion';
+import { ArrowRight,Loader2,Lock,Mail,Store } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { use,useEffect,useState } from 'react';
 
-export default function SellerLoginPage({ params }: { params: Promise<any> }) {
+export default function SellerLoginPage({ params }: { params: Promise<{ lang: string }> }) {
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
   const isAr = lang === 'ar';
@@ -22,8 +22,6 @@ export default function SellerLoginPage({ params }: { params: Promise<any> }) {
     if (isAuthenticated && user) {
       if (user.role === 'seller' || user.role === 'admin') {
         router.push(`/${lang}/seller/dashboard`);
-      } else {
-        setLocalError(isAr ? 'هذا الحساب ليس حساب تاجر' : 'This account is not a seller account');
       }
     }
   }, [isAuthenticated, user, router, lang, isAr]);
@@ -34,7 +32,7 @@ export default function SellerLoginPage({ params }: { params: Promise<any> }) {
     setLocalError('');
     try {
       await login({ email, password });
-    } catch (err) {
+    } catch {
       // Error handled by store
     }
   };
@@ -62,20 +60,19 @@ export default function SellerLoginPage({ params }: { params: Promise<any> }) {
           </p>
         </div>
 
-        {(error || localError) && (
+        {(error || localError || (isAuthenticated && user?.role === 'customer')) && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm text-center font-bold">
-            {localError || error}
+            {localError || error || (isAr ? 'هذا الحساب ليس حساب تاجر' : 'This account is not a seller account')}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+            <label htmlFor="seller-email" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
               {isAr ? 'البريد الإلكتروني' : 'Email Address'}
             </label>
             <div className="relative">
-              <input
-                required
+              <input id="seller-email" required
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -87,12 +84,11 @@ export default function SellerLoginPage({ params }: { params: Promise<any> }) {
           </div>
 
           <div>
-            <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+            <label htmlFor="seller-password" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
               {isAr ? 'كلمة المرور' : 'Password'}
             </label>
             <div className="relative">
-              <input
-                required
+              <input id="seller-password" required
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -102,9 +98,9 @@ export default function SellerLoginPage({ params }: { params: Promise<any> }) {
               <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isAr ? 'right-4' : 'left-4'}`} />
             </div>
             <div className={`mt-2 ${isAr ? 'text-left' : 'text-right'}`}>
-              <a href="#" className="text-sm font-bold text-[#1a365d] hover:underline">
+              <span className="text-sm font-bold text-[#1a365d] hover:underline" title="غير متاح حالياً / Not available yet">
                 {isAr ? 'نسيت كلمة المرور؟' : 'Forgot Password?'}
-              </a>
+               — {isAr ? 'قريباً' : 'Coming soon'}</span>
             </div>
           </div>
 

@@ -1,7 +1,9 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, User, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '@/store/useAuthStore';
+import type { Dictionary } from '@/types/dictionary';
+import { AnimatePresence,motion } from 'framer-motion';
+import { Bot,Send,Sparkles,User,X } from 'lucide-react';
+import { useEffect,useRef,useState } from 'react';
 
 interface Message {
   id: string;
@@ -9,7 +11,7 @@ interface Message {
   text: string;
 }
 
-export default function FloatingButton({ dict, lang }: { dict: any, lang: string }) {
+export default function FloatingButton({ lang }: { dict: Dictionary, lang: string }) {
   const isAr = lang === 'ar';
   
   const [isOpen, setIsOpen] = useState(false);
@@ -28,16 +30,18 @@ export default function FloatingButton({ dict, lang }: { dict: any, lang: string
 
   const quickActions = isAr ? [
     'أبحث عن حذاء مريح',
-    'ما هي العروض اليوم؟',
+    'كيف أقارن عروض المتاجر؟',
   ] : [
     'Comfortable sneakers',
-    "Today's best deals",
+    'How do I compare shop offers?',
   ];
 
   const handleSend = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isTyping) return;
+    const token=useAuthStore.getState().token;
+    if(!token){setMessages(prev=>[...prev,{id:crypto.randomUUID(),type:'ai',text:isAr?'سجل الدخول لاستخدام المساعد':'Please log in to use the assistant'}]);return;}
     
-    const newUserMsg: Message = { id: Date.now().toString(), type: 'user', text };
+    const newUserMsg: Message = { id: crypto.randomUUID(), type: 'user', text };
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
@@ -46,9 +50,10 @@ export default function FloatingButton({ dict, lang }: { dict: any, lang: string
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', Authorization: 'Bearer ' + token,
         },
         body: JSON.stringify({ message: text, lang }),
+        signal: AbortSignal.timeout(35000),
       });
 
       const data = await res.json();
@@ -58,14 +63,14 @@ export default function FloatingButton({ dict, lang }: { dict: any, lang: string
       }
 
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         type: 'ai',
         text: data.text
       }]);
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         type: 'ai',
         text: isAr ? 'عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. يرجى المحاولة لاحقاً.' : 'Sorry, an error occurred while connecting to the AI. Please try again later.'
       }]);

@@ -1,45 +1,59 @@
 'use client';
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Star, ShoppingCart, Heart, Banknote, Truck, RotateCcw, Share2, Store, CheckCircle, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import axios from 'axios';
-import { useCartStore } from '@/store/useCartStore';
-import { useRouter } from 'next/navigation';
+import { useMounted } from '@/hooks/useMounted';
+import api from '@/lib/api';
+import { errorMessage } from '@/lib/errors';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import type { Listing,Product } from '@/types';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { Banknote,CheckCircle,Heart,Loader2,RotateCcw,Share2,ShoppingCart,Star,Store,Truck } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect,useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface ProductDetailsProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   productId: string;
+  initialData?: {product:Product;listings:Listing[]};
 }
 
-export default function ProductDetails({ dict, lang, productId }: ProductDetailsProps) {
+export default function ProductDetails({ dict, lang, productId, initialData }: ProductDetailsProps) {
+  const mounted=useMounted();
+  const wishlisted = useWishlistStore(s=>s.items.some(item=>item._id===productId));
+  const toggleWishlist = useWishlistStore(s=>s.toggleWishlist);
   const isAr = lang === 'ar';
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{product:Product & {images?:string[];descriptionAr?:string;rating?:number;reviewsCount?:number};listings:Listing[]} | null>(initialData || null);
+  const [loading, setLoading] = useState(!initialData);
+  const [fetchError,setFetchError]=useState('');
+  const [retry,setRetry]=useState(0);
   
   const { addItem, isLoading: addingToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const [addingId, setAddingId] = useState<string | null>(null);
 
   useEffect(() => {
+    if(initialData)return;
+    let active=true;
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://bastah-backend.onrender.com/api'}/products/${productId}/listings`);
-        setData(res.data);
+        const res = await api.get(`/products/${productId}/listings`);
+        if(active)setData(res.data);
       } catch (err) {
-        console.error(err);
+        if(active)setFetchError(errorMessage(err));
       } finally {
-        setLoading(false);
+        if(active)setLoading(false);
       }
     };
     fetchProduct();
-  }, [productId]);
+    return ()=>{active=false;};
+  }, [productId,retry,initialData]);
 
   const handleShare = async () => {
     try {
@@ -69,8 +83,8 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
     try {
       await addItem(listingId, 1);
       toast.success(isAr ? 'تمت الإضافة للسلة بنجاح!' : 'Added to cart successfully!');
-    } catch (err: any) {
-      toast.error(err.message || (isAr ? 'فشل إضافة المنتج' : 'Failed to add product'));
+    } catch (err: unknown) {
+      toast.error(errorMessage(err));
       console.error(err);
     } finally {
       setAddingId(null);
@@ -95,6 +109,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
     );
   }
 
+  if(fetchError)return <div role="alert" className="p-12"><p>{fetchError}</p><button onClick={()=>{setFetchError('');setLoading(true);setRetry(n=>n+1);}}>{isAr?'إعادة المحاولة':'Retry'}</button></div>;
   if (!data || !data.product) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500 font-bold text-xl">
@@ -104,7 +119,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
   }
 
   const { product, listings } = data;
-  const bestListing = listings?.[0]; // Usually the cheapest or first
+  const bestListing = listings?.find((listing: { inStock: boolean }) => listing.inStock); // Usually the cheapest or first
 
   return (
     <div className="container mx-auto px-4 md:px-8 py-12">
@@ -112,8 +127,8 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
       <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2">
         <Link href={`/${lang}`} className="hover:text-[#1a365d] transition">{dict.nav?.home || 'Home'}</Link>
         <span>/</span>
-        <Link href={`/${lang}/search?category=${product.category?.slug || product.category}`} className="hover:text-[#1a365d] transition">
-          {isAr ? product.category?.nameAr || product.category : product.category?.name || product.category}
+        <Link href={`/${lang}/search?category=${(product.category && typeof product.category === 'object' ? product.category._id : product.category || '')}`} className="hover:text-[#1a365d] transition">
+          {isAr ? (product.category && typeof product.category === 'object' ? product.category.nameAr : '') : (product.category && typeof product.category === 'object' ? product.category.name : '')}
         </Link>
         <span>/</span>
         <span className="text-[#1a365d] font-medium truncate w-48">{isAr ? product.nameAr : product.name}</span>
@@ -139,9 +154,9 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
                 priority
               />
             </motion.div>
-            <div className={`absolute top-4 ${isAr ? 'left-4' : 'right-4'} bg-white/90 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white transition hover:text-red-500 shadow-sm`}>
-              <Heart className="w-5 h-5 text-gray-400 hover:fill-red-500 hover:text-red-500 transition" />
-            </div>
+            <button aria-label={isAr ? 'المفضلة' : 'Wishlist'} aria-pressed={mounted && wishlisted} onClick={()=>toggleWishlist(product)} className={`absolute top-4 ${isAr ? 'left-4' : 'right-4'} bg-white/90 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white transition hover:text-red-500 shadow-sm`}>
+              <Heart className={mounted && wishlisted ? "w-5 h-5 fill-red-500 text-red-500" : "w-5 h-5 text-gray-400"} />
+            </button>
           </div>
           
           {product.images && product.images.length > 1 && (
@@ -163,7 +178,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
         <div className="flex flex-col">
           <div className="mb-6">
             <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 font-bold text-xs rounded-full mb-3 uppercase tracking-wider">
-              {isAr ? product.category?.nameAr || product.category : product.category?.name || product.category}
+              {product.category && typeof product.category === 'object' ? (isAr ? product.category.nameAr : product.category.name) : ''}
             </span>
             <h1 className="text-3xl md:text-4xl font-extrabold text-[#1a365d] mb-4 leading-tight">
               {isAr ? product.nameAr : product.name}
@@ -172,13 +187,13 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
             <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-1 bg-[#fff8e1] px-3 py-1 rounded-full">
                 <Star className="w-4 h-4 text-[#eab308] fill-[#eab308]" />
-                <span className="font-bold text-gray-800">{product.rating || '0.0'}</span>
+                <span className="font-bold text-gray-800">{product.rating ?? '—'}</span>
                 <span className="text-gray-500 text-sm ml-1">({product.reviewsCount || 0} {dict.product?.reviews || 'Reviews'})</span>
               </div>
               {bestListing?.inStock && (
                 <div className="flex items-center gap-1 text-green-600 font-medium text-sm">
                   <CheckCircle className="w-4 h-4" />
-                  {dict.product?.inStock || 'In Stock'}
+                  {(isAr ? 'متوفر' : 'In stock')}
                 </div>
               )}
             </div>
@@ -238,7 +253,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#1a365d]">
                 <RotateCcw className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-gray-600">Free Returns</span>
+              <span className="text-xs font-bold text-gray-600">{isAr ? 'راجع سياسة المتجر' : 'Check shop return policy'}</span>
             </div>
           </div>
         </div>
@@ -254,7 +269,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
           
           <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
             <div className="grid grid-cols-1 divide-y divide-gray-100">
-              {listings.map((listing: any) => (
+              {listings.map((listing: Listing) => (
                 <div key={listing._id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-gray-50 transition">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center font-bold text-gray-400">
@@ -266,7 +281,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
                       </Link>
                       <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
                         <Star className="w-3.5 h-3.5 text-[#eab308] fill-[#eab308]" />
-                        <span>{listing.shop?.rating || '4.5'}</span>
+                        <span>{listing.shop?.ratingAvg ?? '?'}</span>
                         <span className="mx-2">•</span>
                         <span>{listing.shop?.area}</span>
                       </div>
@@ -280,7 +295,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
                     <motion.button 
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      disabled={addingToCart && addingId === listing._id}
+                      disabled={!listing.inStock || (addingToCart && addingId === listing._id)}
                       onClick={() => handleAddToCart(listing._id)}
                       className="px-6 py-2 bg-white border-2 border-[#1a365d] text-[#1a365d] font-bold rounded-lg hover:bg-[#1a365d] hover:text-white transition disabled:opacity-50 flex items-center gap-2"
                     >
@@ -298,7 +313,7 @@ export default function ProductDetails({ dict, lang, productId }: ProductDetails
       {/* Mobile Sticky Cart Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center justify-between gap-4 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom,1rem)]">
         <div className="flex flex-col">
-          <span className="text-xs text-gray-500 font-bold">{dict.common?.total || 'Total'}</span>
+          <span className="text-xs text-gray-500 font-bold">{(isAr ? 'الإجمالي' : 'Total')}</span>
           <span className="text-lg font-black text-[#1a365d]">
             {bestListing ? `${bestListing.price} ${dict.common?.currency || 'ILS'}` : '-'}
           </span>

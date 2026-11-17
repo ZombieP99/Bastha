@@ -1,22 +1,27 @@
 'use client';
-import { Heart, Star, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import ProductCard from '@/components/products/ProductCard';
 import { getNewProducts } from '@/lib/api';
 import { Product } from '@/types';
-import ProductCard from '@/components/products/ProductCard';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
+import { useEffect,useState } from 'react';
 
-export default function NewArrivals({ dict, lang }: { dict: any, lang: string }) {
+export default function NewArrivals({ dict, lang }: { dict: Dictionary, lang: string }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed,setFailed]=useState(false);
+  const [retry,setRetry]=useState(0);
 
   useEffect(() => {
+    let active=true;
     getNewProducts(1, 4).then((data) => {
+      if(!active)return;
       setProducts(data.products || []);
       setLoading(false);
-    }).catch(console.error);
-  }, []);
+    }).catch(()=>{if(active)setFailed(true);}).finally(() => {if(active)setLoading(false);});
+    return ()=>{active=false;};
+  }, [retry]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -31,6 +36,7 @@ export default function NewArrivals({ dict, lang }: { dict: any, lang: string })
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
+  if(failed)return <div role="alert" className="container mx-auto px-4 py-8"><p>{lang==='ar'?'تعذر تحميل هذا القسم':'Unable to load this section'}</p><button onClick={()=>{setFailed(false);setLoading(true);setRetry(n=>n+1);}}>{lang==='ar'?'إعادة المحاولة':'Retry'}</button></div>;
   if (loading) {
     return <div className="container mx-auto px-4 py-12 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a365d]"></div></div>;
   }

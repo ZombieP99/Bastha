@@ -1,31 +1,30 @@
 'use client';
+import { useMounted } from '@/hooks/useMounted';
+import type { Dictionary } from '@/types/dictionary';
 
-import { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
-import { 
-  Bell, 
-  BellRing, 
-  PackageCheck, 
-  Truck, 
-  Tag, 
-  Sparkles, 
-  ShieldCheck, 
-  Info, 
-  CheckCheck, 
-  Trash2, 
-  ArrowRight, 
-  ArrowLeft, 
-  Clock, 
-  Check, 
-  X,
-  ShoppingBag
+import { errorMessage } from '@/lib/errors';
+import { useAuthStore } from '@/store/useAuthStore';
+import { NotificationItem,useNotificationStore } from '@/store/useNotificationStore';
+import { AnimatePresence,motion } from 'framer-motion';
+import {
+ArrowLeft,
+ArrowRight,
+Bell,
+BellRing,
+Check,
+CheckCheck,
+Clock,
+PackageCheck,
+ShieldCheck,
+Sparkles,
+Trash2
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useEffect,useMemo,useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNotificationStore, NotificationItem } from '@/store/useNotificationStore';
 
 interface NotificationsViewProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 
@@ -35,16 +34,18 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
 
   const { notifications, markAsRead, markAllAsRead, deleteNotification, clearAll, fetchNotifications } = useNotificationStore();
   const [filter, setFilter] = useState<'all' | 'order' | 'offer' | 'system' | 'unread'>('all');
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   useEffect(() => {
-    setMounted(true);
+
     fetchNotifications();
   }, [fetchNotifications]);
 
+  const [now,setNow]=useState(0);
+  useEffect(()=>{const tick=()=>setNow(Date.now());const timer=setInterval(tick,60000);queueMicrotask(tick);return()=>clearInterval(timer);},[]);
   const formatRelativeTime = (isoString?: string) => {
     if (!isoString) return isAr ? 'الآن' : 'Just now';
-    const diffMs = Date.now() - new Date(isoString).getTime();
+    const diffMs = now - new Date(isoString).getTime();
     if (isNaN(diffMs)) return isAr ? 'مؤخراً' : 'Recently';
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     if (diffMinutes < 1) return isAr ? 'الآن' : 'Just now';
@@ -67,15 +68,15 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
     });
   }, [notifications, filter]);
 
-  const handleMarkAllRead = () => {
-    markAllAsRead();
+  const handleMarkAllRead = async () => {
+    try { await markAllAsRead(); } catch (error) { toast.error(errorMessage(error)); return; }
     toast.success(isAr ? 'تم تعليم جميع الإشعارات كمقروءة' : 'All marked as read');
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     if (notifications.length === 0) return;
     if (confirm(isAr ? 'هل أنت متأكد من مسح جميع الإشعارات؟' : 'Are you sure you want to clear all notifications?')) {
-      clearAll();
+      try { await clearAll(); } catch (error) { toast.error(errorMessage(error)); return; }
       toast.success(isAr ? 'تم مسح الإشعارات' : 'Notifications cleared');
     }
   };
@@ -104,6 +105,10 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
     }
   };
 
+  const authenticated = useAuthStore(state => state.isAuthenticated);
+  const notificationError = useNotificationStore(state => state.error);
+  if (mounted && !authenticated) return <div className="p-12 text-center"><Link href={`/${lang}/auth`}>{isAr ? 'سجل الدخول لعرض الإشعارات' : 'Log in to view notifications'}</Link></div>;
+  if (mounted && notificationError) return <div role="alert" className="p-12 text-center"><p>{notificationError}</p><button onClick={()=>fetchNotifications()}>{isAr?'إعادة المحاولة' : 'Retry'}</button></div>;
   if (!mounted) {
     return <div className="bg-[#f8fafc] min-h-screen pt-12 pb-24" />;
   }
@@ -165,7 +170,7 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setFilter(tab.id as any)}
+              onClick={() => setFilter(tab.id as typeof filter)}
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 filter === tab.id
                   ? 'bg-[#1a365d] text-white shadow-md shadow-[#1a365d]/15'
@@ -217,7 +222,7 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
                     exit={{ opacity: 0, x: isAr ? 50 : -50 }}
                     transition={{ duration: 0.25 }}
                     onClick={() => {
-                      if (!item.read) markAsRead(item.id);
+                      if (!item.read) void markAsRead(item.id).catch(error=>toast.error(errorMessage(error)));
                     }}
                     className={`group relative bg-white rounded-3xl p-5 sm:p-6 border transition-all duration-300 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(26,54,93,0.06)] hover:-translate-y-0.5 cursor-pointer ${
                       !item.read
@@ -276,7 +281,7 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  markAsRead(item.id);
+                                  void markAsRead(item.id).catch(error=>toast.error(errorMessage(error)));
                                 }}
                                 className="p-1.5 rounded-lg text-gray-400 hover:text-[#1a365d] hover:bg-gray-100 transition-colors text-xs font-bold inline-flex items-center gap-1"
                                 title={t.markAsRead || 'Mark as read'}
@@ -288,7 +293,7 @@ export default function NotificationsView({ dict, lang }: NotificationsViewProps
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                deleteNotification(item.id);
+                                void deleteNotification(item.id).catch(error=>toast.error(errorMessage(error)));
                               }}
                               className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                               title={t.delete || 'Delete'}

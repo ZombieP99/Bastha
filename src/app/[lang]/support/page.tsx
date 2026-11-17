@@ -1,6 +1,6 @@
-import { Metadata } from 'next';
-import { getDictionary } from '@/i18n/dictionaries';
 import SupportView from '@/components/support/SupportView';
+import { getDictionary } from '@/i18n/dictionaries';
+import { Metadata } from 'next';
 
 export async function generateMetadata({
   params,

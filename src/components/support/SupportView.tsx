@@ -1,36 +1,32 @@
 'use client';
+import type { Dictionary } from '@/types/dictionary';
 
-import { useState, useMemo } from 'react';
-import { 
-  Headphones, 
-  Mail, 
-  Phone, 
-  Clock, 
-  MapPin, 
-  ShieldCheck, 
-  FileText, 
-  RotateCcw, 
-  Send, 
-  Search, 
-  ChevronDown, 
-  CheckCircle2, 
-  Banknote,
-  HelpCircle,
-  MessageCircle,
-  Copy,
-  ExternalLink,
-  Sparkles,
-  ArrowRight,
-  ArrowLeft,
-  X,
-  BadgeCheck,
-  Check
+import { AnimatePresence,motion } from 'framer-motion';
+import {
+ArrowLeft,
+ArrowRight,
+BadgeCheck,
+Banknote,
+Check,
+CheckCircle2,
+ChevronDown,
+Clock,
+Copy,
+FileText,
+HelpCircle,
+Mail,
+MessageCircle,
+Phone,
+RotateCcw,
+Search,
+ShieldCheck,
+X
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo,useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface SupportViewProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   initialTab?: string;
 }
@@ -52,7 +48,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
     message: '',
     category: 'order'
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = false;
   const [isSent, setIsSent] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -86,8 +82,8 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
     });
   }, [faqItems, faqCategory, faqSearch]);
 
-  const handleCopy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopy = async (text: string, key: string) => {
+    try { await navigator.clipboard.writeText(text); } catch { toast.error(isAr?'تعذر النسخ':'Unable to copy'); return; }
     setCopiedKey(key);
     toast.success(isAr ? 'تم النسخ إلى الحافظة' : 'Copied to clipboard');
     setTimeout(() => setCopiedKey(null), 2000);
@@ -100,12 +96,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
       return;
     }
 
-    setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 900));
-    setIsSubmitting(false);
-    setIsSent(true);
-    toast.success(t.contact?.success || (isAr ? 'تم إرسال رسالتك بنجاح!' : 'Message sent successfully!'));
-    setFormData({ name: '', email: '', subject: '', message: '', category: 'order' });
+    toast.error(isAr ? 'خدمة الرسائل غير متاحة بعد. لم تُرسل الرسالة.' : 'Messaging is not available yet. Your message was not sent.');
   };
 
   const subjectPresets = [
@@ -233,7 +224,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                       <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">
                         {t.contact?.emailLabel || (isAr ? 'البريد الإلكتروني' : 'Email Address')}
                       </div>
-                      <a href="mailto:support@bastah.com" className="font-extrabold text-[#1a365d] hover:text-[#2b4c7e] text-base sm:text-lg block transition-colors">
+                      <a aria-disabled="true" className="font-extrabold text-[#1a365d] hover:text-[#2b4c7e] text-base sm:text-lg block transition-colors">
                         support@bastah.com
                       </a>
                     </div>
@@ -262,13 +253,13 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                       <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">
                         {t.contact?.phoneLabel || (isAr ? 'الهاتف المباشر والواتساب' : 'Phone & WhatsApp')}
                       </div>
-                      <a href="tel:+970590000000" dir="ltr" className="font-extrabold text-[#1a365d] hover:text-emerald-700 text-base sm:text-lg block transition-colors">
-                        +970 59 000 0000
+                      <a aria-disabled="true" dir="ltr" className="font-extrabold text-[#1a365d] hover:text-emerald-700 text-base sm:text-lg block transition-colors">
+                        غير متاح / Not available
                       </a>
                     </div>
                   </div>
                   <button
-                    onClick={() => handleCopy('+970590000000', 'phone')}
+                    disabled
                     className="p-2.5 rounded-xl bg-gray-50 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 transition-all"
                     title={isAr ? 'نسخ الرقم' : 'Copy phone'}
                   >
@@ -359,6 +350,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                 </motion.div>
               ) : (
                 <form onSubmit={handleContactSubmit} className="space-y-6">
+                  <p role="status">{isAr ? 'نموذج التواصل غير متاح حالياً. لم يتم ربط خدمة استقبال الرسائل بعد.' : 'The contact form is currently unavailable. Message delivery has not been connected yet.'}</p>
                   
                   {/* Category Pills */}
                   <div>
@@ -447,7 +439,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                   <div className="pt-2">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
+                      disabled title={isAr ? 'غير متاح حالياً' : 'Not available yet'}
                       className="group w-full sm:w-auto bg-gradient-to-r from-[#1a365d] to-[#2b4c7e] text-white px-8 py-4 rounded-2xl font-extrabold text-sm hover:shadow-xl hover:shadow-[#1a365d]/20 hover:-translate-y-0.5 active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-60"
                     >
                       {isSubmitting ? (
@@ -648,7 +640,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
               </div>
               <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-emerald-200">
                 <BadgeCheck className="w-4 h-4 text-emerald-600" />
-                <span>{isAr ? 'محدثة لعام 2024' : 'Updated 2024'}</span>
+                <span>{isAr ? 'سياسات المنصة' : 'Platform policies'}</span>
               </div>
             </div>
 

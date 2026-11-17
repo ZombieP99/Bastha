@@ -1,11 +1,15 @@
 'use client';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { ShoppingCart, Heart } from 'lucide-react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/useCartStore';
+import { useMounted } from '@/hooks/useMounted';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import type { Product as CatalogProduct } from '@/types';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { Heart,ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export interface Product {
@@ -17,18 +21,22 @@ export interface Product {
   image: string;
   inStock: boolean;
   category: string;
+  original: CatalogProduct;
 }
 
 interface ProductCardProps {
   product: Product;
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 
 export default function ProductCard({ product, dict, lang }: ProductCardProps) {
   const isAr = lang === 'ar';
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+
+  const mounted=useMounted();
+  const storedLike = useWishlistStore(s=>s.items.some(item=>item._id===product.id));
+  const isLiked=mounted && storedLike;
+  const toggleWishlist = useWishlistStore(s=>s.toggleWishlist);
   const [adding, setAdding] = useState(false);
   const router = useRouter();
   const { addItem } = useCartStore();
@@ -44,7 +52,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
 
     if (!token) {
       toast.error(isAr ? 'يرجى تسجيل الدخول أولاً' : 'Please log in first');
-      router.push(`/${lang}/auth/login`);
+      router.push(`/${lang}/auth?mode=login`);
       return;
     }
 
@@ -68,8 +76,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
         show: { opacity: 1, y: 0 }
       }}
       className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full group relative cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      role="link" tabIndex={0} onKeyDown={e=>{if(e.target===e.currentTarget && e.key==='Enter')handleCardClick();}}
       onClick={handleCardClick}
     >
       {/* Product Image */}
@@ -83,8 +90,8 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
         />
         
         {/* Like Button */}
-        <button 
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setIsLiked(!isLiked); }}
+        <button aria-label={isAr?'المفضلة':'Wishlist'} aria-pressed={isLiked}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggleWishlist(product.original); }}
           className={`absolute top-4 ${isAr ? 'left-4' : 'right-4'} z-10 p-2.5 rounded-full backdrop-blur-md transition-all ${
             isLiked ? 'bg-red-50 text-red-500' : 'bg-white/80 text-gray-500 hover:bg-white hover:text-red-500'
           }`}

@@ -1,14 +1,20 @@
 'use client';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ProductGrid from './ProductGrid';
+import api from '@/lib/api';
+import { errorMessage } from '@/lib/errors';
+import { useAuthStore } from '@/store/useAuthStore';
+import type { Review,Shop } from '@/types';
+import type { Dictionary } from '@/types/dictionary';
+import { AnimatePresence,motion } from 'framer-motion';
+import { Star } from 'lucide-react';
+import { useEffect,useState } from 'react';
+import toast from 'react-hot-toast';
 import { Product } from './ProductCard';
-import { Star, MessageSquare } from 'lucide-react';
+import ProductGrid from './ProductGrid';
 
 interface ShopTabsProps {
-  shop: any;
+  shop: Shop;
   products: Product[];
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 
@@ -23,6 +29,23 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [reviewError, setReviewError] = useState('');
+  useEffect(() => {
+    let active=true;
+    api.get<{reviews:Review[];total:number}>(`/shops/${shop._id}/reviews?page=${page}`).then(({data})=>{if(active){setReviews(data.reviews);setTotal(data.total);setReviewError('');}}).catch(error=>{if(active)setReviewError(errorMessage(error));});
+    return ()=>{active=false;};
+  },[shop._id,page,isSubmitted]);
+  const submitReview = async () => {
+    if(useAuthStore.getState().user?.role !== 'customer') {toast.error(isAr?'سجل الدخول بحساب زبون':'Log in as a customer');return;}
+    if(submitting)return;
+    setSubmitting(true);
+    try {await api.post(`/shops/${shop._id}/reviews`,{rating,comment});setIsSubmitted(true);}
+    catch(error){toast.error(errorMessage(error));} finally {setSubmitting(false);}
+  };
 
   const tabs = [
     { id: 'overview', label: dict?.shopsPage?.shopDetails?.overview || (isAr ? 'نظرة عامة' : 'Overview') },
@@ -37,7 +60,7 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'overview' | 'products' | 'reviews')}
             className={`pb-4 px-2 transition-colors relative ${
               activeTab === tab.id 
                 ? 'text-[#1a365d] font-extrabold border-b-4 border-[#1a365d]' 
@@ -71,7 +94,7 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
                 {isAr ? 'الموقع الجغرافي' : 'Location'}
               </h3>
               <p className="text-gray-700 text-lg">
-                {isAr ? 'غزة، فلسطين - يقع المتجر في وسط المدينة ليقدم لكم أفضل الخدمات وأجود المنتجات.' : 'Gaza, Palestine - Located in the city center to provide you with the best services and highest quality products.'}
+                {shop.address || shop.area || (isAr ? 'لم يحدد المتجر موقعه' : 'Location not provided')}
               </p>
             </div>
           )}
@@ -83,6 +106,9 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
           {activeTab === 'reviews' && (
             <div className={`bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm ${isAr ? 'text-right' : 'text-left'}`}>
               
+              {reviewError && <p role="alert">{reviewError}</p>}
+              <div className="space-y-4 mb-8">{reviews.map(review=><article key={review._id} className="border-b pb-4"><strong>{review.author?.name}</strong><p>{review.rating} / 5</p><p>{review.comment}</p></article>)}</div>
+              {total > 20 && <nav className="flex gap-4 mb-8"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)}>{isAr?'السابق':'Previous'}</button><span>{page} / {Math.ceil(total/20)}</span><button disabled={page>=Math.ceil(total/20)} onClick={()=>setPage(p=>p+1)}>{isAr?'التالي':'Next'}</button></nav>}
               {!isSubmitted ? (
                 <div>
                   <h3 className="text-2xl font-bold text-[#1a365d] mb-2">
@@ -100,6 +126,7 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
+                          aria-label={(isAr ? 'تقييم ' : 'Rate ')+star} aria-pressed={rating===star}
                           onClick={() => setRating(star)}
                           onMouseEnter={() => setHoveredRating(star)}
                           onMouseLeave={() => setHoveredRating(0)}
@@ -130,20 +157,15 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
                   </div>
 
                   <button
-                    onClick={() => {
-                      if (rating > 0 && comment.trim() !== '') {
-                        setIsSubmitted(true);
-                        // Here you would normally send the data to your backend
-                      }
-                    }}
-                    disabled={rating === 0 || comment.trim() === ''}
+                    onClick={submitReview}
+                    disabled={rating === 0 || submitting}
                     className={`w-full md:w-auto px-8 py-3 rounded-xl font-bold transition-all shadow-sm ${
                       rating > 0 && comment.trim() !== ''
                         ? 'bg-[#1a365d] text-white hover:bg-blue-800'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    {isAr ? 'إرسال التقييم' : 'Submit Review'}
+                    {submitting ? (isAr ? 'جاري الإرسال…' : 'Sending…') : (isAr ? 'إرسال التقييم' : 'Submit Review')}
                   </button>
                 </div>
               ) : (
@@ -165,7 +187,7 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
                     }}
                     className="mt-8 text-[#1a365d] font-bold underline hover:text-blue-800"
                   >
-                    {isAr ? 'إضافة تقييم آخر' : 'Add another review'}
+                    {isAr ? 'العودة' : 'Back'}
                   </button>
                 </div>
               )}

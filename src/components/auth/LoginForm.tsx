@@ -1,12 +1,13 @@
 'use client';
-import { useState } from 'react';
-import { Mail, Lock, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
+import type { Dictionary } from '@/types/dictionary';
+import { motion } from 'framer-motion';
+import { Loader2,Lock,Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface LoginFormProps {
-  dict: any;
+  dict: Dictionary;
   isAr: boolean;
   lang: string;
 }
@@ -23,7 +24,7 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
     try {
       await login({ email, password });
       router.push(`/${lang}`);
-    } catch (err) {
+    } catch {
       // Error is handled by store
     }
   };
@@ -37,16 +38,15 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
       )}
       <div className="space-y-4">
         <div>
-          <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
-            {isAr ? 'البريد الإلكتروني أو رقم الهاتف' : 'Email or Phone'}
+          <label htmlFor="login-email" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+            {isAr ? 'البريد الإلكتروني أو رقم الهاتف' : 'Email'}
           </label>
           <div className="relative">
-            <input
-              required
-              type="text"
+            <input id="login-email" required
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={isAr ? 'البريد الإلكتروني أو رقم الهاتف' : 'Email or Phone'}
+              placeholder={isAr ? 'البريد الإلكتروني أو رقم الهاتف' : 'Email'}
               className={`w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1a365d] focus:border-transparent outline-none transition-all ${isAr ? 'pr-12 text-right' : 'pl-12 text-left'}`}
             />
             <Mail className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isAr ? 'right-4' : 'left-4'}`} />
@@ -54,12 +54,11 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
         </div>
 
         <div>
-          <label className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
+          <label htmlFor="login-password" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
             {dict?.auth?.password}
           </label>
           <div className="relative">
-            <input
-              required
+            <input id="login-password" required
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -69,9 +68,9 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
             <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isAr ? 'right-4' : 'left-4'}`} />
           </div>
           <div className={`mt-2 ${isAr ? 'text-left' : 'text-right'}`}>
-            <a href="#" className="text-sm font-bold text-[#1a365d] hover:underline">
+            <span className="text-sm font-bold text-[#1a365d] hover:underline" title="غير متاح حالياً / Not available yet">
               {dict?.auth?.forgotPassword}
-            </a>
+             — {isAr ? 'قريباً' : 'Coming soon'}</span>
           </div>
         </div>
       </div>

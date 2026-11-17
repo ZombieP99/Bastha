@@ -1,12 +1,12 @@
-import { getDictionary } from '@/i18n/dictionaries';
 import AuthContainer from '@/components/auth/AuthContainer';
+import { getDictionary } from '@/i18n/dictionaries';
 
 export default async function AuthPage({
   params,
   searchParams,
 }: {
-  params: Promise<any>;
-  searchParams: Promise<any>;
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<{ mode?: string }> ;
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
@@ -17,7 +17,7 @@ export default async function AuthPage({
 
   return (
     <div className="bg-gray-50/50">
-      <AuthContainer dict={dict} lang={lang} initialMode={initialMode} />
+      <AuthContainer key={initialMode} dict={dict} lang={lang} initialMode={initialMode} />
     </div>
   );
 }

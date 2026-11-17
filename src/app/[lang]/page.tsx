@@ -1,13 +1,13 @@
-import Hero from '@/components/home/Hero';
-import TrendingProducts from '@/components/home/TrendingProducts';
-import NewArrivals from '@/components/home/NewArrivals';
 import FeaturedStores from '@/components/home/FeaturedStores';
+import Hero from '@/components/home/Hero';
+import NewArrivals from '@/components/home/NewArrivals';
+import TrendingProducts from '@/components/home/TrendingProducts';
 import { getDictionary } from '@/i18n/dictionaries';
 
 export default async function Home({
   params,
 }: {
-  params: Promise<any>;
+  params: Promise<{ lang: string }>;
 }) {
   const resolvedParams = await params;
   const lang = resolvedParams.lang as 'en' | 'ar';

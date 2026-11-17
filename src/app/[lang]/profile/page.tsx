@@ -1,38 +1,41 @@
 'use client';
+import AccountGate from '@/components/auth/AccountGate';
+import api from '@/lib/api';
+import { errorMessage } from '@/lib/errors';
+import type { Order } from '@/types';
 
-import { use, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useRouter } from 'next/navigation';
-import { User, Package, Heart, Settings, LogOut, Edit2, Calendar, MapPin, Search, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { Calendar,ChevronLeft,ChevronRight,Edit2,Heart,LogOut,Package,Settings,User } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { use,useEffect,useState } from 'react';
 
-export default function ProfilePage({ params }: { params: Promise<any> }) {
+export default function ProfilePage({ params }: { params: Promise<{ lang: string }> }) {
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
+  const sessionToken=useAuthStore(s=>s.token);
+  return <AccountGate lang={lang}><ProfileContent key={sessionToken} lang={lang}/></AccountGate>;
+}
+function ProfileContent({lang}:{lang:string}) {
   const isAr = lang === 'ar';
   const router = useRouter();
 
   const { user, isAuthenticated, logout, isLoading, token } = useAuthStore();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isOrdersLoading, setIsOrdersLoading] = useState(true);
+  const [ordersError,setOrdersError]=useState('');
+
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(`/${lang}/auth?mode=login`);
-    }
-  }, [isAuthenticated, isLoading, router, lang]);
-
-  useEffect(() => {
+    let active=true;
     if (token) {
-      axios.get('https://bastah-backend.onrender.com/api/orders', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => setOrders(res.data.orders?.slice(0, 3) || []))
-      .catch(err => console.error('Failed to load orders', err))
-      .finally(() => setIsOrdersLoading(false));
+      api.get('/orders', {params:{limit:3}})
+      .then(res => {if(active)setOrders(res.data.orders?.slice(0, 3) || []);})
+      .catch(err => {if(active)setOrdersError(errorMessage(err));})
+      .finally(() => {if(active)setIsOrdersLoading(false);});
     }
+    return ()=>{active=false;};
   }, [token]);
 
   if (isLoading || !isAuthenticated) {
@@ -119,7 +122,7 @@ export default function ProfilePage({ params }: { params: Promise<any> }) {
                 <h3 className="text-2xl font-black text-gray-800">
                   {isAr ? 'إعدادات الحساب' : 'Account Settings'}
                 </h3>
-                <button className="flex items-center gap-2 text-[#1a365d] font-bold hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors">
+                <button disabled title={isAr ? 'تعديل الحساب غير متاح حالياً' : 'Account editing is not available yet'} className="opacity-50 flex items-center gap-2 text-[#1a365d] font-bold hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors">
                   <Edit2 className="w-4 h-4" />
                   <span>{isAr ? 'تعديل' : 'Edit'}</span>
                 </button>
@@ -170,11 +173,12 @@ export default function ProfilePage({ params }: { params: Promise<any> }) {
               </div>
 
               <div className="space-y-4">
+                {ordersError && <p role="alert">{ordersError} <button onClick={()=>window.location.reload()}>{isAr?'إعادة المحاولة':'Retry'}</button></p>}
                 {isOrdersLoading ? (
                   <div className="flex justify-center p-8"><div className="animate-spin w-8 h-8 border-4 border-[#1a365d] border-t-transparent rounded-full"></div></div>
                 ) : orders.length === 0 ? (
                   <div className="text-center p-8 text-gray-500 font-bold">{isAr ? 'لا توجد طلبات سابقة' : 'No previous orders'}</div>
-                ) : orders.map((order, idx) => (
+                ) : orders.map((order) => (
                   <Link key={order._id} href={`/${lang}/checkout/success?orders=${order._id}`} className="block">
                     <div className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-gray-100 hover:border-[#1a365d]/20 hover:shadow-md transition-all gap-4 group">
                     

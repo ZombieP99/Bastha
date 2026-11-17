@@ -1,12 +1,12 @@
+import ShopCard from '@/components/shops/ShopCard';
 import { getDictionary } from '@/i18n/dictionaries';
 import { getShops } from '@/lib/api';
-import ShopCard from '@/components/shops/ShopCard';
 import { Store } from 'lucide-react';
 
 export default async function ShopsPage({
   params,
 }: {
-  params: Promise<any>;
+  params: Promise<{ lang: string }>;
 }) {
   const resolvedParams = await params;
   const lang = resolvedParams.lang as 'en' | 'ar';
@@ -38,7 +38,7 @@ export default async function ShopsPage({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {shops.map((shop) => (
-              <ShopCard key={shop._id} shop={shop as any} dict={dict} lang={lang} />
+              <ShopCard key={shop._id} shop={shop} dict={dict} lang={lang} />
             ))}
           </div>
         )}

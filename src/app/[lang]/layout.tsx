@@ -1,23 +1,24 @@
-import type { Metadata } from "next";
-import { Tajawal, Inter } from "next/font/google";
-import "../globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import FloatingButton from "@/components/layout/FloatingButton";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
+import NotificationListener from '@/components/notifications/NotificationListener';
 import { getDictionary } from "@/i18n/dictionaries";
+import type { Metadata } from "next";
+import { Inter,Tajawal } from "next/font/google";
+import { notFound } from 'next/navigation';
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'react-hot-toast';
-import NotificationListener from '@/components/notifications/NotificationListener';
+import "../globals.css";
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
   weight: ["200", "300", "400", "500", "700", "800", "900"],
-  variable: "--font-tajawal",
+  variable: "--font-tajawal-source",
 });
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-inter-source",
 });
 
 export const metadata: Metadata = {
@@ -30,10 +31,11 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<any>;
+  params: Promise<{ lang: string }>;
 }>) {
   // Await params as required by Next.js 15+ 
   const resolvedParams = await params;
+  if (!['ar','en'].includes(resolvedParams.lang)) notFound();
   const lang = resolvedParams.lang as 'en' | 'ar';
   
   const dict = await getDictionary(lang);
