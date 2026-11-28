@@ -1,15 +1,18 @@
 'use client';
 import { useMounted } from '@/hooks/useMounted';
-import { getCategories,searchProducts } from '@/lib/api';
+import { getCategories,searchMarketplace, type SearchCounts } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
-import { useNotificationStore } from '@/store/useNotificationStore';
+import { destination, useNotificationStore } from '@/store/useNotificationStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
-import { Category } from '@/types';
+import { Category, Product } from '@/types';
+import ProductImage from '@/components/products/ProductImage';
 import type { Dictionary } from '@/types/dictionary';
 import { AnimatePresence,motion } from 'framer-motion';
 import { Bell,CheckCheck,Globe,Heart,Loader2,Package,Search,ShoppingBag,ShoppingCart,Tag,X } from 'lucide-react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { errorMessage } from '@/lib/errors';
 import { usePathname,useRouter } from 'next/navigation';
 import { useEffect,useRef,useState } from 'react';
 
@@ -19,7 +22,8 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [liveSuggestions, setLiveSuggestions] = useState<{name:string;type:'product'|'shop'}[]>([]);
+  const [liveSuggestions, setLiveSuggestions] = useState<{name:string;type:'product'|'shop'|'category';path:string;product?:Product}[]>([]);
+  const [counts, setCounts] = useState<SearchCounts | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const mounted = useMounted();
 
@@ -27,8 +31,9 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
   const fetchCart = useCartStore((state) => state.fetchCart);
   const totalWishlistItems = useWishlistStore((state) => state.items.length);
   const notifications = useNotificationStore((state) => state.notifications);
-  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
-  const isRinging = useNotificationStore((state) => state.isRinging);
+  const unreadNotificationsCount = useNotificationStore(state=>state.unreadCount);
+  const previewLoading = useNotificationStore(state => state.previewLoading);
+  const previewError = useNotificationStore(state => state.error);
   const markAsRead = useNotificationStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
 
@@ -71,9 +76,11 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
     let active=true;
     const timer = setTimeout(() => {
       setIsSearching(true);
-      searchProducts(searchQuery, undefined, undefined, 1, 5)
+      searchMarketplace(searchQuery)
         .then((data) => {
-          if(active)setLiveSuggestions(data.products.map((p) => ({ name: lang === 'ar' ? p.nameAr : p.name, type: 'product' })));
+          if (!active) return;
+          setCounts(data.counts);
+          setLiveSuggestions([...data.products.map(p=>({name:lang==='ar'?p.nameAr:p.name,type:'product' as const,product:p,path:'/products/'+p._id})), ...data.shops.map(s=>({name:s.name,type:'shop' as const,path:'/shops/'+s._id})), ...data.categories.map(c=>({name:lang==='ar'?c.nameAr:c.name,type:'category' as const,path:'/search?category='+c._id}))]);
         })
         .catch(() => {if(active)setLiveSuggestions([]);})
         .finally(() => {if(active)setIsSearching(false);});
@@ -129,7 +136,7 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
               <ShoppingBag className="w-6 h-6 text-green-600" />
             </motion.div>
             <h1 className="text-3xl font-extrabold text-[#1a365d]">
-              {lang === 'ar' ? 'بسطة' : 'Bastha'}
+              {lang === 'ar' ? 'بسطة' : 'Bastah'}
             </h1>
           </Link>
 
@@ -175,23 +182,28 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
                       </div>
                     ) : liveSuggestions.length > 0 ? (
                       <div className="flex flex-col gap-2">
+                        {counts && <div className="flex flex-wrap gap-4">{(['products','shops','categories'] as const).filter(type=>counts[type]>0).map(type =>
+                          <Link key={type} className="font-semibold underline" href={'/'+lang+'/search?'+new URLSearchParams({type,q:searchQuery})} onClick={()=>setIsSearchFocused(false)}>
+                            {lang==='ar' ? {products:'كل المنتجات',shops:'كل المتاجر',categories:'كل الفئات'}[type] : {products:'All products',shops:'All shops',categories:'All categories'}[type]} ({counts[type]})
+                          </Link>)}</div>}
                         {liveSuggestions.map((suggestion, idx) => (
                           <button 
                             key={idx}
                             onClick={() => {
                               setSearchQuery(suggestion.name);
-                              router.push(`/${lang}/search?q=${encodeURIComponent(suggestion.name)}`);
+                              router.push('/'+lang+suggestion.path);
                               setIsSearchFocused(false);
                             }}
                             className={`flex items-center gap-3 bg-gray-50 hover:bg-gray-100 border border-transparent hover:border-gray-200 p-3 px-4 rounded-xl transition-colors w-full ${lang === 'ar' ? 'flex-row text-right' : 'flex-row text-left'}`}
                           >
+                            <span className="relative size-10 shrink-0 overflow-hidden rounded-lg bg-slate-100">{suggestion.product ? <ProductImage product={suggestion.product} alt="" sizes="40px"/> : <Tag className="m-2 size-5"/>}</span>
                             <span className="font-bold text-[#1a365d]">{suggestion.name}</span>
                             <span className={`text-xs font-bold px-2.5 py-1 rounded-md text-white shadow-sm ${
                               suggestion.type === 'shop' 
                                 ? 'bg-indigo-500' 
                                 : 'bg-[#eab308]'
                             }`}>
-                              {suggestion.type === 'shop' ? (lang === 'ar' ? 'متجر' : 'Shop') : (lang === 'ar' ? 'منتج' : 'Product')}
+                              {suggestion.type === 'category' ? (lang==='ar'?'فئة':'Category') : suggestion.type === 'shop' ? (lang === 'ar' ? 'متجر' : 'Shop') : (lang === 'ar' ? 'منتج' : 'Product')}
                             </span>
                           </button>
                         ))}
@@ -272,7 +284,7 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
           
           <div className="hidden sm:flex items-center gap-4 text-sm font-medium">
             {mounted && isAuthenticated ? (
-              <Link href={`/${lang}/${user?.role === 'customer' ? 'profile' : 'seller/dashboard'}`} className="flex items-center gap-2 hover:bg-gray-50 px-3 py-1.5 rounded-full transition-colors border border-transparent hover:border-gray-200 cursor-pointer">
+              <Link href={`/${lang}/${user?.role === 'seller' ? 'seller/profile' : user?.role === 'customer' ? 'profile' : 'admin/dashboard'}`} className="flex items-center gap-2 hover:bg-gray-50 px-3 py-1.5 rounded-full transition-colors border border-transparent hover:border-gray-200 cursor-pointer">
                 <div className="w-8 h-8 bg-blue-100 text-[#1a365d] rounded-full flex items-center justify-center font-bold shadow-sm">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
@@ -293,26 +305,22 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
           </div>
           
           {/* Notifications Bell with Dropdown */}
-          <div className="relative" ref={notifDropdownRef}>
+          {mounted && isAuthenticated && user?.role !== "admin" && <div className="relative" ref={notifDropdownRef}>
             <button
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              onClick={() => { if (!isNotificationsOpen) void useNotificationStore.getState().fetchNotifications(); setIsNotificationsOpen(!isNotificationsOpen); }}
               className="relative flex items-center p-1.5 rounded-full hover:bg-gray-100/70 transition-colors cursor-pointer group"
               title={lang === 'ar' ? 'الإشعارات' : 'Notifications'}
-              aria-label="Notifications"
+              aria-expanded={isNotificationsOpen}
+              aria-label={lang === "ar" ? "الإشعارات" : "Notifications"}
             >
               <motion.div
-                animate={isRinging ? {
-                  rotate: [0, -18, 18, -14, 14, -8, 8, -4, 4, 0],
-                  scale: [1, 1.25, 1.25, 1.15, 1.15, 1]
-                } : { rotate: 0, scale: 1 }}
-                transition={{ duration: 0.9, ease: 'easeInOut' }}
                 whileHover={{ scale: 1.1 }}
               >
                 <Bell className={`w-6 h-6 transition-colors ${unreadNotificationsCount > 0 ? 'text-[#1a365d]' : 'text-gray-700'} group-hover:text-[#1a365d]`} />
               </motion.div>
               {mounted && unreadNotificationsCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-md animate-pulse">
-                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
                 </span>
               )}
             </button>
@@ -343,7 +351,7 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
 
                     {unreadNotificationsCount > 0 && (
                       <button
-                        onClick={() => { void markAllAsRead().catch(() => {}); }}
+                        onClick={() => { void markAllAsRead().catch(e => toast.error(errorMessage(e))); }}
                         className="text-xs font-bold text-[#1a365d] hover:text-blue-700 transition flex items-center gap-1"
                       >
                         <CheckCheck className="w-3.5 h-3.5" />
@@ -354,24 +362,23 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
 
                   {/* Dropdown Items List */}
                   <div className="max-h-72 overflow-y-auto space-y-2 py-1 no-scrollbar">
-                    {notifications.length === 0 ? (
+                    {previewLoading && !notifications.length ? <p role="status" className="p-3 text-sm">{lang === "ar" ? "جارٍ التحميل…" : "Loading…"}</p> : previewError ? <button onClick={() => void useNotificationStore.getState().fetchNotifications()} className="p-3 text-sm">{lang === "ar" ? "تعذر تحميل الإشعارات. إعادة المحاولة" : "Could not load notifications. Retry"}</button> : notifications.length === 0 ? (
                       <div className="text-center py-8 text-gray-400">
                         <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
                         <p className="text-xs font-bold">{lang === 'ar' ? 'لا توجد إشعارات حالياً' : 'No notifications yet'}</p>
                       </div>
                     ) : (
                       notifications.slice(0, 5).map((item) => (
-                        <div
-                          key={item.id}
+                        <button
+                          key={item._id}
                           onClick={() => {
-                            if (!item.read) void markAsRead(item.id).catch(() => {});
-                            if (item.link) {
-                              setIsNotificationsOpen(false);
-                              router.push(`/${lang}${item.link}`);
-                            }
+                            if (!item.readAt) void markAsRead(item._id).catch(e => toast.error(errorMessage(e)));
+                            const path = destination(item,user?.role === "seller");
+                            setIsNotificationsOpen(false);
+                            router.push("/" + lang + (path || "/notifications"));
                           }}
-                          className={`p-3 rounded-2xl border transition-all cursor-pointer ${
-                            !item.read
+                          className={`w-full text-start p-3 rounded-2xl border transition-all cursor-pointer ${
+                            !item.readAt
                               ? 'bg-blue-50/50 border-blue-100 hover:bg-blue-50'
                               : 'bg-white border-gray-50 hover:bg-gray-50'
                           }`}
@@ -381,18 +388,18 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
                               {item.type === 'order' ? '📦' : item.type === 'offer' ? '✨' : '🔔'}
                             </span>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-xs font-bold truncate ${!item.read ? 'text-[#1a365d]' : 'text-gray-800'}`}>
-                                {item.title}
+                              <p className={`text-xs font-bold truncate ${!item.readAt ? 'text-[#1a365d]' : 'text-gray-800'}`}>
+                                {lang === "ar" ? item.titleAr || item.title : item.title}
                               </p>
                               <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">
-                                {item.message}
+                                {lang === "ar" ? item.bodyAr || item.body : item.body}
                               </p>
                             </div>
-                            {!item.read && (
+                            {!item.readAt && (
                               <span className="w-2 h-2 rounded-full bg-[#1a365d] mt-1 shrink-0" />
                             )}
                           </div>
-                        </div>
+                        </button>
                       ))
                     )}
                   </div>
@@ -410,7 +417,7 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div>}
 
           <Link aria-label={lang === 'ar' ? 'المفضلة' : 'Wishlist'} href={`/${lang}/wishlist`} className="relative flex items-center group">
             <motion.div whileHover={{ scale: 1.1 }}>
@@ -444,7 +451,7 @@ export default function Navbar({ dict, lang }: { dict: Dictionary, lang: string 
         <nav aria-label={lang==='ar'?'التنقل الرئيسي' : 'Main navigation'} className="flex flex-wrap gap-4 text-sm font-bold">
           <Link href={`/${lang}/products`}>{lang==='ar'?'المنتجات' : 'Products'}</Link>
           <Link href={`/${lang}/shops`}>{lang==='ar'?'المتاجر' : 'Shops'}</Link>
-          <Link href={`/${lang}/${isAuthenticated ? user?.role === 'customer' ? 'profile' : 'seller/dashboard' : 'auth'}`}>{lang==='ar'?'حسابي' : 'Account'}</Link>
+          <Link href={`/${lang}/${isAuthenticated ? user?.role === 'seller' ? 'seller/profile' : user?.role === 'customer' ? 'profile' : 'admin/dashboard' : 'auth'}`}>{lang==='ar'?'حسابي' : 'Account'}</Link>
           <Link href={`/${lang}/orders`}>{lang==='ar'?'طلباتي' : 'Orders'}</Link>
           <Link href={`/${lang}/support`}>{lang==='ar'?'الدعم' : 'Support'}</Link>
         </nav>

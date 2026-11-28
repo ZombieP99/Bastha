@@ -1,11 +1,12 @@
 import ShopCard from '@/components/shops/ShopCard';
 import { getDictionary } from '@/i18n/dictionaries';
-import { getShops } from '@/lib/api';
+import api, { getShops } from '@/lib/api';
 import { Store } from 'lucide-react';
 
 export default async function ShopsPage({
-  params,
+  params, searchParams,
 }: {
+  searchParams: Promise<{owner?:string;deliversTo?:string}>;
   params: Promise<{ lang: string }>;
 }) {
   const resolvedParams = await params;
@@ -14,7 +15,8 @@ export default async function ShopsPage({
   const isAr = lang === 'ar';
 
   // Fetch all shops
-  const shops = await getShops();
+  const {owner,deliversTo}=await searchParams;
+  const [shops,areaData]=await Promise.all([getShops({owner,deliversTo}),api.get<{areas:{_id:string;name:string;nameAr:string}[]}>('/areas').catch(()=>null)]);
 
   return (
     <div className="bg-[#f8fafc] min-h-screen pt-12 pb-20">
@@ -31,6 +33,7 @@ export default async function ShopsPage({
           </p>
         </div>
 
+        {areaData && <form className="mb-4 flex items-center gap-2">{owner && <input type="hidden" name="owner" value={owner}/>}<label>{isAr?'منطقة التوصيل':'Delivery area'} <select name="deliversTo" defaultValue={deliversTo || ''}><option value="">{isAr?'جميع المناطق':'All areas'}</option>{areaData.data.areas.map(a=><option key={a._id} value={a._id}>{isAr?a.nameAr:a.name}</option>)}</select></label><button className="rounded-lg border p-2">{isAr?'عرض':'Apply'}</button></form>}
         {shops.length === 0 ? (
           <div className="text-center py-20 text-gray-500">
             {isAr ? 'لا توجد متاجر حالياً.' : 'No shops available currently.'}

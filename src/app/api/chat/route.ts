@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         const key = process.env.GEMINI_API_KEY, modelName = process.env.GEMINI_MODEL;
         if (!key || !modelName)
             return NextResponse.json({ error: 'Assistant is not configured yet' }, { status: 503 });
-        const model = new GoogleGenerativeAI(key).getGenerativeModel({ model: modelName, systemInstruction: 'You are Bastha support. Reply in ' + (lang === 'ar' ? 'Arabic' : 'English') + '. You have no live inventory, prices, orders, or conversation history. Never invent them. Direct users to product search, offers, and order pages. Do not claim to perform actions.', generationConfig: { maxOutputTokens: 500 } });
+        const model = new GoogleGenerativeAI(key).getGenerativeModel({ model: modelName, systemInstruction: 'You are Bastah support. Reply in ' + (lang === 'ar' ? 'Arabic' : 'English') + '. You have no live inventory, prices, orders, or conversation history. Never invent them. Direct users to product search, offers, and order pages. Do not claim to perform actions.', generationConfig: { maxOutputTokens: 500 } });
         const result = await model.generateContent(payload.message.trim(), { timeout: 20000 });
         return NextResponse.json({ text: result.response.text() });
     }

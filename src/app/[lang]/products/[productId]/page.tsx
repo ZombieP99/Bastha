@@ -6,8 +6,9 @@ import ProductDetails from '@/components/products/ProductDetails';
 import { getDictionary } from '@/i18n/dictionaries';
 
 export default async function ProductPage({
-  params,
+  params, searchParams,
 }: {
+  searchParams: Promise<{ listing?: string }>;
   params: Promise<{ lang: string; productId: string }>;
 }) {
   const resolvedParams = await params;
@@ -21,13 +22,13 @@ export default async function ProductPage({
 
   return (
     <div className="bg-white min-h-screen">
-      <ProductDetails key={productId} dict={dict} lang={lang} productId={productId} initialData={initialData} />
+      <ProductDetails selectedListingId={(await searchParams).listing} key={productId} dict={dict} lang={lang} productId={productId} initialData={initialData} />
     </div>
   );
 }
 
 export async function generateMetadata({params}:{params:Promise<{lang:string;productId:string}>}):Promise<Metadata> {
  const {lang,productId}=await params;
- try {const {product}=await readProduct(productId);const title=(lang==='ar'?product.nameAr:product.name)+' | Bastha';return {title,description:product.description,alternates:{languages:{ar:'/ar/products/'+productId,en:'/en/products/'+productId}}};}
- catch {return {title:lang==='ar'?'المنتج | بسطة':'Product | Bastha'};}
+ try {const {product}=await readProduct(productId);const title=(lang==='ar'?product.nameAr:product.name)+' | Bastah';return {title,description:product.description,alternates:{languages:{ar:'/ar/products/'+productId,en:'/en/products/'+productId}}};}
+ catch {return {title:lang==='ar'?'المنتج | بسطة':'Product | Bastah'};}
 }

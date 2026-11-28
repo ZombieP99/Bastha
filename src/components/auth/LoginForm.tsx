@@ -1,4 +1,6 @@
 'use client';
+import { afterCustomerLogin } from '@/lib/shopping-login';
+import { useLoginFeedback } from '@/hooks/useLoginFeedback';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { Dictionary } from '@/types/dictionary';
 import { motion } from 'framer-motion';
@@ -17,13 +19,14 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
   const [password, setPassword] = useState('');
   const { login, isLoading, error, clearError } = useAuthStore();
   const router = useRouter();
+  const waiting = useLoginFeedback();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
     try {
       await login({ email, password });
-      router.push(`/${lang}`);
+      router.replace(afterCustomerLogin(lang, window.location.search));
     } catch {
       // Error is handled by store
     }
@@ -39,7 +42,7 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
       <div className="space-y-4">
         <div>
           <label htmlFor="login-email" className={`block text-sm font-bold text-gray-700 mb-1 ${isAr ? 'text-right' : 'text-left'}`}>
-            {isAr ? 'البريد الإلكتروني أو رقم الهاتف' : 'Email'}
+            {isAr ? 'البريد الإلكتروني' : 'Email'}
           </label>
           <div className="relative">
             <input id="login-email" required
@@ -77,7 +80,7 @@ export default function LoginForm({ dict, isAr, lang }: LoginFormProps) {
 
       <motion.button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || waiting}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className="w-full mt-6 bg-gradient-to-r from-[#1a365d] to-[#2b4c7e] text-white py-3 rounded-xl font-bold text-lg hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70"

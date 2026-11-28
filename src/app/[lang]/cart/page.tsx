@@ -1,10 +1,10 @@
 'use client';
 import { useMounted } from '@/hooks/useMounted';
 
-import { useCartStore } from '@/store/useCartStore';
+import { hasCartListing, useCartStore } from '@/store/useCartStore';
 import { AnimatePresence,motion } from 'framer-motion';
 import { ArrowLeft,ArrowRight,Minus,Plus,ShoppingBag,Trash2 } from 'lucide-react';
-import Image from 'next/image';
+import ProductImage from '@/components/products/ProductImage';
 import Link from 'next/link';
 import { use } from 'react';
 
@@ -60,9 +60,19 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
               <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6">
                   <AnimatePresence>
-                    {items.map((item) => (
+                    {items.map((item, index) => {
+                      const listing = item.listing;
+                      if (!hasCartListing(item) || !listing) {
+                        const id = listing?._id || item.listingId;
+                        return <div key={item._id || id || index} className="rounded-xl bg-amber-50 p-4">
+                          <p>{isAr ? 'عرض محذوف أو غير متاح' : 'Removed or unavailable listing'} × {item.quantity}</p>
+                          {id ? <button disabled={isLoading} className="underline" onClick={() => void removeItem(id)}>{isAr ? 'إزالة المنتج' : 'Remove item'}</button>
+                           : <p>{isAr ? 'لا يوجد معرّف لهذا العرض. يمكنك إفراغ السلة كاملة من الزر أعلاه.' : 'This listing has no ID. You can clear the entire cart using the button above.'}</p>}
+                        </div>;
+                      }
+                      return (
                       <motion.div 
-                        key={item.listing._id}
+                        key={listing._id}
                         layout
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -70,12 +80,11 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                         className="flex flex-col sm:flex-row items-center gap-6 py-6 border-b border-gray-100 last:border-0"
                       >
                         {/* Image */}
-                        <Link href={`/${lang}/products/${item.listing.product._id}`}>
+                        <Link href={`/${lang}/products/${listing.product._id}`}>
                           <div className="w-24 h-24 rounded-2xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100 relative">
-                            <Image 
-                              src={item.listing.product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
-                              alt={isAr ? item.listing.product.nameAr : item.listing.product.name}
-                              fill
+                            <ProductImage
+                              product={listing.product}
+                              alt={isAr ? listing.product.nameAr : listing.product.name}
                               className="object-cover"
                               sizes="96px"
                             />
@@ -85,22 +94,23 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                         {/* Details */}
                         <div className="flex-1 w-full text-center sm:text-start">
                           <div className="text-xs font-bold text-[#2b4c7e] mb-1 bg-[#eaf1f8] inline-block px-2 py-1 rounded-md">
-                            {item.listing.shop?.name || 'Store'}
+                            {listing.shop?.name || 'Store'}
                           </div>
-                          <Link href={`/${lang}/products/${item.listing.product._id}`}>
+                          {(!listing.inStock || listing.product.isActive === false) && <p className="font-bold text-red-700">{isAr ? 'غير متاح للشراء · أزل المنتج للمتابعة' : 'Unavailable · Remove this item to continue'}</p>}
+                          <Link href={`/${lang}/products/${listing.product._id}`}>
                             <h3 className="font-bold text-gray-800 text-lg hover:text-[#1a365d] transition-colors line-clamp-2">
-                              {isAr ? item.listing.product.nameAr : item.listing.product.name}
+                              {isAr ? listing.product.nameAr : listing.product.name}
                             </h3>
                           </Link>
                           <p className="text-[#a38024] font-bold mt-2">
-                            {item.listing.price} ₪
+                            {listing.price} ₪
                           </p>
                         </div>
 
                         {/* Actions */}
                         <div className="flex flex-col sm:items-end gap-4 w-full sm:w-auto">
                           <button 
-                            disabled={isLoading} onClick={() => { void removeItem(item.listing._id).catch(()=>{}); }}
+                            disabled={isLoading} onClick={() => { void removeItem(listing._id).catch(()=>{}); }}
                             className="text-gray-400 hover:text-red-500 transition-colors p-2 self-end sm:self-auto"
                             title={isAr ? 'حذف' : 'Remove'}
                           >
@@ -109,7 +119,7 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                           
                           <div className="flex items-center justify-between sm:justify-start gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
                             <button 
-                              onClick={() => { void updateQuantity(item.listing._id, item.quantity - 1).catch(()=>{}); }}
+                              onClick={() => { void updateQuantity(listing._id, item.quantity - 1).catch(()=>{}); }}
                               disabled={isLoading || item.quantity <= 1}
                               className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm disabled:opacity-50 hover:bg-gray-100 transition-colors"
                             >
@@ -119,7 +129,7 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                               {item.quantity}
                             </span>
                             <button 
-                              disabled={isLoading} onClick={() => { void updateQuantity(item.listing._id, item.quantity + 1).catch(()=>{}); }}
+                              disabled={isLoading} onClick={() => { void updateQuantity(listing._id, item.quantity + 1).catch(()=>{}); }}
                               className="w-8 h-8 flex items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm hover:bg-gray-100 transition-colors"
                             >
                               <Plus className="w-4 h-4" />
@@ -127,7 +137,7 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                           </div>
                         </div>
                       </motion.div>
-                    ))}
+                    );})}
                   </AnimatePresence>
                 </div>
               </div>

@@ -2,14 +2,14 @@
 import { useMounted } from '@/hooks/useMounted';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import type { Product } from '@/types';
-import { Heart,ShoppingCart,Sparkles,Star } from 'lucide-react';
-import Image from 'next/image';
+import { Heart,ShoppingCart,Sparkles } from 'lucide-react';
+import ProductImage from './ProductImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function ProductCard({ product, lang, isNew = false }: { product: Product, lang: string, isNew?: boolean }) {
   const isAr = lang === 'ar';
-  
+
   const mounted = useMounted();
   const toggleWishlistStore = useWishlistStore(state => state.toggleWishlist);
   const wishlistItems = useWishlistStore(state => state.items);
@@ -40,7 +40,7 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
           </span>
         </div>
       )}
-      
+
       {/* Like Button */}
       <button aria-label={isAr?'المفضلة':'Wishlist'} aria-pressed={isWishlisted}
         onClick={toggleWishlist}
@@ -54,10 +54,9 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
       {/* Image */}
       <Link href={`/${lang}/products/${product._id}`}>
         <div className="aspect-square rounded-xl overflow-hidden mb-4 relative bg-gray-50">
-          <Image 
-            src={product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop'} 
-            alt={isAr ? product.nameAr : product.name} 
-            fill
+          <ProductImage
+            product={product}
+            alt={isAr ? product.nameAr : product.name}
             className="object-cover group-hover:scale-110 transition-transform duration-500"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
@@ -70,23 +69,16 @@ export default function ProductCard({ product, lang, isNew = false }: { product:
         <div className="text-xs font-bold text-[#2b4c7e] mb-2 bg-[#eaf1f8] inline-block px-2 py-1 rounded-md self-start">
           {typeof product.category === 'object' && product.category !== null ? (isAr ? product.category.nameAr : product.category.name) : 'Category'}
         </div>
-        
+
         <Link href={`/${lang}/products/${product._id}`}>
           <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-[#1a365d] transition-colors h-10">
             {isAr ? product.nameAr : product.name}
           </h3>
         </Link>
-        
-        <div className="flex items-center gap-2 mb-4 mt-auto">
-          <div className="flex items-center gap-1 bg-yellow-50 px-1.5 py-0.5 rounded text-yellow-600">
-            <Star className="w-3.5 h-3.5 fill-current" />
-            <span className="text-xs font-bold">?</span>
-          </div>
-          <span className="text-xs text-gray-400 font-medium">(0 {isAr ? 'تقييم' : 'reviews'})</span>
-        </div>
+
 
         <div className="pt-4 border-t border-gray-100 mt-auto">
-          <button 
+          <button
             onClick={handleAddToCart}
             className="w-full py-2.5 rounded-xl bg-[#1a365d] flex items-center justify-center gap-2 px-4 text-white font-bold hover:bg-[#2b4c7e] hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md group/btn overflow-hidden text-sm"
           >

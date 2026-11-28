@@ -1,4 +1,5 @@
 'use client';
+import { shoppingLogin } from '@/lib/shopping-login';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
@@ -7,7 +8,7 @@ import type { Product as CatalogProduct } from '@/types';
 import type { Dictionary } from '@/types/dictionary';
 import { motion } from 'framer-motion';
 import { Heart,ShoppingCart } from 'lucide-react';
-import Image from 'next/image';
+import ProductImage from '@/components/products/ProductImage';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -18,7 +19,6 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
   inStock: boolean;
   category: string;
   original: CatalogProduct;
@@ -52,7 +52,7 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
 
     if (!token) {
       toast.error(isAr ? 'يرجى تسجيل الدخول أولاً' : 'Please log in first');
-      router.push(`/${lang}/auth?mode=login`);
+      router.push(shoppingLogin(lang, product.id, product.listingId));
       return;
     }
 
@@ -81,14 +81,13 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
     >
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
-        <Image 
-          src={product.image} 
-          alt={product.name} 
-          fill
+        <ProductImage
+          product={product.original}
+          alt={product.name}
           className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
-        
+
         {/* Like Button */}
         <button aria-label={isAr?'المفضلة':'Wishlist'} aria-pressed={isLiked}
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggleWishlist(product.original); }}
@@ -114,11 +113,11 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
         <div className="text-xs font-bold text-gray-400 mb-2 tracking-wider uppercase">
           {product.category}
         </div>
-        
+
         <h3 className="font-extrabold text-lg text-[#1a365d] mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors">
           {product.name}
         </h3>
-        
+
         <p className="text-sm text-gray-500 line-clamp-2 mb-4 leading-relaxed flex-1">
           {product.description}
         </p>
@@ -132,14 +131,14 @@ export default function ProductCard({ product, dict, lang }: ProductCardProps) {
             </span>
           </div>
 
-          <motion.button 
+          <motion.button
             onClick={handleAddToCart}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={!product.inStock || adding}
             className={`p-3 rounded-xl flex items-center justify-center transition-colors shadow-sm ${
               product.inStock && !adding
-                ? 'bg-[#1a365d] text-white hover:bg-blue-700' 
+                ? 'bg-[#1a365d] text-white hover:bg-blue-700'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}
             title={dict?.shopsPage?.shopDetails?.addToCart}

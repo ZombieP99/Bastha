@@ -2,16 +2,18 @@
 import AccountGate from '@/components/auth/AccountGate';
 import { useMounted } from '@/hooks/useMounted';
 import api from '@/lib/api';
+import { checkoutRecovery } from '@/lib/orders';
 import { errorMessage } from '@/lib/errors';
-import type { CartItem } from '@/store/useCartStore';
+import { hasCartListing, type CartListing, type CartItem } from '@/store/useCartStore';
 
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
 import { AnimatePresence,motion } from 'framer-motion';
 import { CheckCircle2,Info,ShieldCheck,Store,Truck } from 'lucide-react';
+import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { use,useEffect,useMemo,useState } from 'react';
+import { use,useEffect,useMemo,useRef,useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface Area {
@@ -30,16 +32,17 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
   const sessionToken=useAuthStore(s=>s.token);
-  return <AccountGate lang={lang}><CheckoutContent key={sessionToken} lang={lang}/></AccountGate>;
+  return <AccountGate lang={lang} customer><CheckoutContent key={sessionToken} lang={lang}/></AccountGate>;
 }
 function CheckoutContent({lang}:{lang:string}) {
   const isAr = lang === 'ar';
   const router = useRouter();
 
   const mounted = useMounted();
-  const { items, isLoading:cartLoading } = useCartStore();
+  const { items, isLoading:cartLoading, error:cartError, fetchCart, removeItem } = useCartStore();
   const token = useAuthStore((state) => state.token);
 
+  const [areaError, setAreaError] = useState('');
   const [areas, setAreas] = useState<Area[]>([]);
   const [shopDetails, setShopDetails] = useState<Record<string, ShopDetails>>({});
   
@@ -50,15 +53,20 @@ function CheckoutContent({lang}:{lang:string}) {
     details: '',
     note: ''
   });
+  const [checkoutIssue, setCheckoutIssue] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dataError,setDataError]=useState('');
   const [retry,setRetry]=useState(0);
 
-  // Group items by shop
+  const submitting = useRef(false);
+  const [closedShops, setClosedShops] = useState<string[]>([]);
+  const visibleItems = useMemo(() => items.filter(hasCartListing), [items]);
+  const unavailable = items.some(item => !hasCartListing(item) || !item.listing.inStock || item.listing.product.isActive === false);
+
   const groupedByShop = useMemo(() => {
-    const groups: Record<string, { shop: CartItem['listing']['shop']; items: CartItem[]; subtotal: number }> = {};
-    items.forEach((item) => {
+    const groups: Record<string, { shop: CartListing['shop']; items: CartItem[]; subtotal: number }> = {};
+    visibleItems.forEach((item) => {
       const shopId = item.listing.shop._id;
       if (!groups[shopId]) {
         groups[shopId] = { shop: item.listing.shop, items: [], subtotal: 0 };
@@ -67,30 +75,37 @@ function CheckoutContent({lang}:{lang:string}) {
       groups[shopId].subtotal += item.listing.price * item.quantity;
     });
     return Object.values(groups);
-  }, [items]);
+  }, [visibleItems]);
 
   useEffect(() => {
     let active=true;
     const fetchData = async () => {
       try {
         // 1. Fetch areas
-        const areasRes = await api.get('/areas');
-        if(active)setAreas(areasRes.data.areas || []);
+        const areaRequest = api.get<{areas: Area[]}>('/areas').then(r => {
+          if (!active) return;
+          setAreas(r.data.areas);
+          setFormData(prev => !prev.areaId || r.data.areas.some(area => area._id === prev.areaId)
+            ? prev : {...prev, areaId: ''});
+          setAreaError('');
+        }).catch(error => { if (active) setAreaError(errorMessage(error)); });
 
         // 2. Fetch full shop details for shops in cart to get deliveryZones
-        const uniqueShopIds = Array.from(new Set(items.map(item => item.listing.shop._id)));
+        const uniqueShopIds = Array.from(new Set(visibleItems.map(item => item.listing.shop._id)));
         const detailsMap: Record<string, ShopDetails> = {};
         
-        await Promise.all(uniqueShopIds.map(async (id) => {
+        const closed: string[] = [];
+        await Promise.all([areaRequest, ...uniqueShopIds.map(async (id) => {
           try {
             const shopRes = await api.get(`/shops/${id}`);
             detailsMap[id] = shopRes.data.shop;
           } catch (e) {
-            throw e;
+            if (axios.isAxiosError(e) && e.response?.status === 404) closed.push(id);
+            else throw e;
           }
-        }));
+        })]);
         
-        if(active){setShopDetails(detailsMap);setDataError('');}
+        if(active){setClosedShops(closed);setShopDetails(detailsMap);setDataError('');}
       } catch (err) {
         if(active)setDataError(errorMessage(err));
       } finally {
@@ -104,9 +119,11 @@ function CheckoutContent({lang}:{lang:string}) {
       queueMicrotask(()=>{if(active)setIsLoadingData(false);});
     }
     return ()=>{active=false;};
-  }, [items,retry]);
+  }, [items,visibleItems,retry]);
 
   if (!mounted || isLoadingData || cartLoading) return <div className="min-h-screen bg-[#f8fafc] pt-20 flex justify-center"><div className="animate-spin w-8 h-8 border-4 border-[#1a365d] border-t-transparent rounded-full"></div></div>;
+
+  if (cartError) return <div role="alert" className="mx-auto max-w-xl py-12"><p>{cartError}</p><button className="underline" onClick={() => void fetchCart()}>{isAr ? 'إعادة تحميل السلة' : 'Reload cart'}</button></div>;
 
   if (items.length === 0 && !isSubmitting) {
     return (
@@ -124,7 +141,7 @@ function CheckoutContent({lang}:{lang:string}) {
   }
 
   // Calculate fees and validation for the current selected area
-  let canCheckout = (deliveryMethod==='pickup' || !dataError) && items.every(item=>item.listing.inStock);
+  let canCheckout = (deliveryMethod === 'pickup' || !areaError) && !dataError && !unavailable && !closedShops.length && items.length > 0;
   const shopSummaries = groupedByShop.map(group => {
     let fee = 0;
     let error = null;
@@ -159,7 +176,7 @@ function CheckoutContent({lang}:{lang:string}) {
 
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canCheckout || isSubmitting) return;
+    if (!canCheckout || submitting.current) return;
     if(!formData.phone.trim()){toast.error(isAr?'أدخل رقم الهاتف':'Enter a phone number');return;}
 
     if (!token) {
@@ -167,15 +184,17 @@ function CheckoutContent({lang}:{lang:string}) {
       return;
     }
 
+    submitting.current = true;
+    setCheckoutIssue(null);
     setIsSubmitting(true);
     try {
       const payload: {contactPhone:string;note:string;deliveryMethod?:string;address?:{area:string;details:string}} = {
         contactPhone: formData.phone,
+        deliveryMethod,
         note: formData.note
       };
 
       if (deliveryMethod === 'delivery') {
-        payload.deliveryMethod = 'delivery';
         payload.address = {
           area: formData.areaId,
           details: formData.details
@@ -194,17 +213,37 @@ function CheckoutContent({lang}:{lang:string}) {
       router.push(`/${lang}/checkout/success?orders=${orderIds}`);
     } catch (err: unknown) {
       if(useAuthStore.getState().token!==token)return;
-      setIsSubmitting(false);
       const msg = errorMessage(err);
       toast.error(msg);
       
-      // If 409, some items might be unavailable, we should redirect back to cart if needed, but error message is enough for now.
+      const recovery = checkoutRecovery(err);
+      if (recovery === 'cart_empty' || recovery === 'cart_changed') {
+        void fetchCart().catch(() => {});
+        router.replace('/' + lang + '/orders?checkout=' + recovery);
+        return;
+      }
+      if (recovery === 'refresh-cart') {
+        setCheckoutIssue(axios.isAxiosError(err) && err.response?.data?.code || 'cart');
+        setIsLoadingData(true);
+        await fetchCart().catch(() => {});
+        setRetry(v => v + 1);
+      } else if (recovery === 'check-orders') {
+        setCheckoutIssue('unknown');
+      } else if (recovery === 'review-input') {
+        setRetry(v => v + 1);
+      }
+      submitting.current = false;
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="bg-[#f8fafc] min-h-screen pt-12 pb-20">
-      {dataError && <div role="alert" className="p-6 text-red-700"><p>{dataError}</p><button onClick={()=>{setIsLoadingData(true);setRetry(v=>v+1);}}>{isAr?'إعادة المحاولة':'Retry'}</button></div>}
+      {(unavailable || checkoutIssue === 'item_unavailable' || checkoutIssue === 'out_of_stock' || checkoutIssue === 'cart') && <div role="alert" className="mx-auto max-w-6xl rounded-xl bg-amber-50 p-4">
+        <Link className="underline" href={'/'+lang+'/cart'}>{isAr ? 'راجع المنتجات غير المتاحة وأزلها من السلة' : 'Review and remove unavailable items in your cart'}</Link></div>}
+      {checkoutIssue === 'unknown' && <p role="alert" className="mx-auto max-w-6xl p-4"><Link className="underline" href={'/'+lang+'/orders'}>{isAr ? 'تعذّر تأكيد النتيجة. تحقق من طلباتك أو أعد المحاولة.' : 'The result is uncertain. Check your orders or retry.'}</Link></p>}
+      {checkoutIssue === 'no_delivery_to_area' && deliveryMethod === 'delivery' && <p role="alert" className="mx-auto max-w-6xl p-4">{isAr ? 'اختر منطقة أخرى أو الاستلام من المتجر.' : 'Choose another area or select pickup.'}</p>}
+      {(dataError || (areaError && deliveryMethod === 'delivery')) && <div role="alert" className="p-6 text-red-700"><p>{dataError || areaError}</p><button onClick={()=>{setIsLoadingData(true);setRetry(v=>v+1);}}>{isAr?'إعادة المحاولة':'Retry'}</button></div>}
       <div className="container mx-auto px-4 md:px-8 max-w-6xl">
         <div className="flex items-center gap-3 mb-10">
           <ShieldCheck className="w-8 h-8 text-[#1a365d]" />
@@ -286,7 +325,7 @@ function CheckoutContent({lang}:{lang:string}) {
                           <select 
                             required={deliveryMethod === 'delivery'}
                             value={formData.areaId}
-                            onChange={(e) => setFormData({...formData, areaId: e.target.value})}
+                            onChange={(e) => {setCheckoutIssue(null);setFormData({...formData, areaId: e.target.value});}}
                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:bg-white transition-all"
                           >
                             <option value="">{isAr ? 'اختر منطقتك' : 'Select your area'}</option>
@@ -344,6 +383,15 @@ function CheckoutContent({lang}:{lang:string}) {
                   </span>
                 </div>
                 
+                {closedShops.includes(summary.shop._id) && <div className="mb-3 rounded-xl bg-amber-50 p-3">
+                  <p>{isAr ? 'هذا المتجر مغلق' : 'This shop is closed'}</p>
+                  <button type="button" disabled={cartLoading || isSubmitting} className="underline" onClick={async () => {
+                    for (const item of summary.items) {
+                      if (!item.listing || useAuthStore.getState().token !== token) break;
+                      await removeItem(item.listing._id);
+                      if (useCartStore.getState().error) break;
+                    }
+                  }}>{isAr ? 'إزالة منتجات هذا المتجر' : 'Remove this shop’s items'}</button></div>}
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>{isAr ? 'المجموع الفرعي' : 'Subtotal'}</span>

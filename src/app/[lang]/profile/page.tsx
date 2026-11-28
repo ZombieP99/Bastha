@@ -1,6 +1,7 @@
 'use client';
 import AccountGate from '@/components/auth/AccountGate';
 import api from '@/lib/api';
+import { orderStatus } from '@/lib/orders';
 import { errorMessage } from '@/lib/errors';
 import type { Order } from '@/types';
 
@@ -15,7 +16,7 @@ export default function ProfilePage({ params }: { params: Promise<{ lang: string
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as 'en' | 'ar';
   const sessionToken=useAuthStore(s=>s.token);
-  return <AccountGate lang={lang}><ProfileContent key={sessionToken} lang={lang}/></AccountGate>;
+  return <AccountGate lang={lang} customer><ProfileContent key={sessionToken} lang={lang}/></AccountGate>;
 }
 function ProfileContent({lang}:{lang:string}) {
   const isAr = lang === 'ar';
@@ -42,6 +43,7 @@ function ProfileContent({lang}:{lang:string}) {
     return <div className="min-h-screen bg-[#f8fafc] pt-20" />;
   }
 
+  const joined=user?.createdAt ? new Date(user.createdAt) : null;
   const handleLogout = () => {
     logout();
     router.push(`/${lang}`);
@@ -77,7 +79,7 @@ function ProfileContent({lang}:{lang:string}) {
               <p className="text-gray-500 text-sm mt-1 mb-4">{user?.email}</p>
               
               <div className="px-5 py-2 bg-blue-50 text-[#1a365d] rounded-full text-xs font-bold uppercase tracking-wider">
-                {user?.role === 'customer' ? (isAr ? 'زبون مميز' : 'Premium Customer') : user?.role}
+                {user?.role === 'customer' ? (isAr ? 'زبون' : 'Customer') : user?.role}
               </div>
             </motion.div>
 
@@ -122,10 +124,10 @@ function ProfileContent({lang}:{lang:string}) {
                 <h3 className="text-2xl font-black text-gray-800">
                   {isAr ? 'إعدادات الحساب' : 'Account Settings'}
                 </h3>
-                <button disabled title={isAr ? 'تعديل الحساب غير متاح حالياً' : 'Account editing is not available yet'} className="opacity-50 flex items-center gap-2 text-[#1a365d] font-bold hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors">
+                <Link href={'/' + lang + '/profile/edit'} className="flex items-center gap-2 rounded-xl px-4 py-2 font-bold text-[#1a365d] hover:bg-blue-50">
                   <Edit2 className="w-4 h-4" />
                   <span>{isAr ? 'تعديل' : 'Edit'}</span>
-                </button>
+                </Link>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -146,7 +148,7 @@ function ProfileContent({lang}:{lang:string}) {
                   <div className="flex items-center gap-3 p-4 bg-[#f8fafc] rounded-2xl border border-gray-100">
                     <Calendar className="w-5 h-5 text-[#1a365d]" />
                     <p className="text-gray-800 font-bold text-lg">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '---'}
+                      {joined && Number.isFinite(joined.getTime()) ? joined.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : (isAr ? 'غير متاح' : 'Not available')}
                     </p>
                   </div>
                 </div>
@@ -176,10 +178,10 @@ function ProfileContent({lang}:{lang:string}) {
                 {ordersError && <p role="alert">{ordersError} <button onClick={()=>window.location.reload()}>{isAr?'إعادة المحاولة':'Retry'}</button></p>}
                 {isOrdersLoading ? (
                   <div className="flex justify-center p-8"><div className="animate-spin w-8 h-8 border-4 border-[#1a365d] border-t-transparent rounded-full"></div></div>
-                ) : orders.length === 0 ? (
+                ) : ordersError ? null : orders.length === 0 ? (
                   <div className="text-center p-8 text-gray-500 font-bold">{isAr ? 'لا توجد طلبات سابقة' : 'No previous orders'}</div>
                 ) : orders.map((order) => (
-                  <Link key={order._id} href={`/${lang}/checkout/success?orders=${order._id}`} className="block">
+                  <Link key={order._id} href={`/${lang}/orders?id=${order._id}`} className="block">
                     <div className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-gray-100 hover:border-[#1a365d]/20 hover:shadow-md transition-all gap-4 group">
                     
                     <div className="flex items-center gap-5">
@@ -187,11 +189,11 @@ function ProfileContent({lang}:{lang:string}) {
                         <Package className="w-7 h-7 text-gray-400 group-hover:text-[#1a365d] transition-colors" />
                       </div>
                       <div>
-                        <h4 className="font-black text-gray-800 text-lg mb-1">ORD-{order._id.slice(-5).toUpperCase()}</h4>
+                        <h4 className="font-black text-gray-800 text-lg mb-1">{order._id.slice(-8)}</h4>
                         <div className="flex items-center gap-3 text-sm text-gray-500 font-medium">
                           <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {new Date(order.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US')}</span>
                           <span>•</span>
-                          <span>{order.items?.length || 0} {isAr ? 'منتجات' : 'items'}</span>
+                          <span>{order.items.reduce((sum, item) => sum + item.quantity, 0)} {isAr ? 'منتجات' : 'items'}</span>
                         </div>
                       </div>
                     </div>
@@ -199,7 +201,7 @@ function ProfileContent({lang}:{lang:string}) {
                     <div className="flex items-center justify-between md:justify-end gap-8 border-t md:border-t-0 pt-4 md:pt-0 border-gray-100 mt-2 md:mt-0">
                       <div className="text-left md:text-right">
                         <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">{isAr ? 'الإجمالي' : 'Total'}</p>
-                        <p className="font-black text-[#1a365d] text-xl">{order.subtotal + (order.deliveryFee || 0)} ₪</p>
+                        <p className="font-black text-[#1a365d] text-xl">{order.total} ₪</p>
                       </div>
                       
                       <div className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 ${
@@ -212,14 +214,7 @@ function ProfileContent({lang}:{lang:string}) {
                           order.status === 'cancelled' ? 'bg-red-500' :
                           'bg-blue-500'
                         }`}></div>
-                        <span>{
-                          order.status === 'pending' ? (isAr ? 'قيد الانتظار' : 'Pending') :
-                          order.status === 'accepted' ? (isAr ? 'تم القبول' : 'Accepted') :
-                          order.status === 'ready' ? (isAr ? 'جاهز' : 'Ready') :
-                          order.status === 'delivering' ? (isAr ? 'جاري التوصيل' : 'Out for delivery') :
-                          order.status === 'completed' || order.status === 'delivered' ? (isAr ? 'مكتمل' : 'Completed') :
-                          order.status === 'cancelled' ? (isAr ? 'ملغي' : 'Cancelled') : order.status
-                        }</span>
+                        <span>{orderStatus(order.status, isAr)}</span>
                       </div>
                     </div>
 

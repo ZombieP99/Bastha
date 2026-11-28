@@ -142,7 +142,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
             transition={{ delay: 0.2 }}
             className="text-gray-500 text-base md:text-lg leading-relaxed max-w-2xl mx-auto font-medium"
           >
-            {t.pageSubtitle || (isAr ? 'فريق بسطة هنا للإجابة عن أسئلتك، وحل مشكلاتك، وضمان تجربة تسوق محلية آمنة وموثوقة.' : 'Bastha support is here to answer your questions, resolve issues, and ensure a reliable local shopping experience.')}
+            {t.pageSubtitle || (isAr ? 'فريق بسطة هنا للإجابة عن أسئلتك، وحل مشكلاتك، وضمان تجربة تسوق محلية آمنة وموثوقة.' : 'Bastah support is here to answer your questions, resolve issues, and ensure a reliable local shopping experience.')}
           </motion.p>
         </div>
 
@@ -298,7 +298,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                   <div>
                     <div className="inline-flex items-center gap-1.5 bg-amber-400/20 text-amber-300 px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider mb-2">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      {isAr ? 'ضمان بسطة المالي' : 'Bastha Guarantee'}
+                      {isAr ? 'ضمان بسطة المالي' : 'Bastah Guarantee'}
                     </div>
                     <h4 className="text-base font-extrabold mb-1.5">
                       {isAr ? 'الدفع نقداً عند الاستلام فقط' : '100% Cash On Delivery'}
@@ -306,7 +306,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                     <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
                       {isAr
                         ? 'لحمايتك، لا تطلب منصة بسطة أي بيانات بنكية أو بطاقات دفع إطلاقاً. تدفع قيمة مشترياتك نقداً للمتجر أو مندوب التوصيل بعد معاينة طلبك.'
-                        : 'For your security, Bastha never asks for card or bank details. You always pay cash directly to the merchant upon inspecting your delivery.'}
+                        : 'For your security, Bastah never asks for card or bank details. You always pay cash directly to the merchant upon inspecting your delivery.'}
                     </p>
                   </div>
                 </div>
@@ -635,7 +635,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                   {isAr ? 'الشفافية والأمان' : 'Transparency & Safety'}
                 </span>
                 <h3 className="text-2xl font-black text-[#1a365d]">
-                  {t.policies?.title || (isAr ? 'سياسات وشروط منصة بسطة' : 'Bastha Platform Policies')}
+                  {t.policies?.title || (isAr ? 'سياسات وشروط منصة بسطة' : 'Bastah Platform Policies')}
                 </h3>
               </div>
               <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-emerald-200">
@@ -663,7 +663,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                 {t.policies?.privacy?.content || (
                   isAr 
                     ? 'نحن في بسطة نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. نجمع فقط المعلومات الضرورية لتشغيل الخدمة وتسهيل التواصل بينك وبين المتاجر المحلية. لا نشارك بياناتك أو نبيعها لأي طرف ثالث لأغراض دعائية. يحق لك في أي وقت طلب حذف حسابك وسجل طلباتك من خوادمنا بشكل كامل.'
-                    : 'At Bastha, we respect your privacy and are committed to protecting your personal data. We only collect the necessary information required to operate the service and connect you with local stores. We never sell your data to third parties. You may request full account deletion at any time.'
+                    : 'At Bastah, we respect your privacy and are committed to protecting your personal data. We only collect the necessary information required to operate the service and connect you with local stores. We never sell your data to third parties. You may request full account deletion at any time.'
                 )}
               </p>
             </div>
@@ -687,7 +687,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                 {t.policies?.terms?.content || (
                   isAr
                     ? 'باستخدامك لمنصة بسطة، فإنك تقر وتوافق على الالتزام بالقواعد الآتية: تقديم معلومات اتصال صحيحة ودقيقة لضمان وصول الطلب، الالتزام بالدفع نقداً عند استلام الطلبات المؤكدة، واحترام سياسات التجار المحليين. تحتفظ منصة بسطة بالحق في حظر أي حساب يسيء استخدام خدمة الطلبات أو يقدم معلومات وهمية.'
-                    : 'By using the Bastha platform, you agree to provide accurate information for deliveries, honor confirmed cash orders, and respect local merchants. Bastha reserves the right to suspend any accounts that abuse the platform or submit fraudulent reservations.'
+                    : 'By using the Bastah platform, you agree to provide accurate information for deliveries, honor confirmed cash orders, and respect local merchants. Bastah reserves the right to suspend any accounts that abuse the platform or submit fraudulent reservations.'
                 )}
               </p>
             </div>
@@ -711,7 +711,7 @@ export default function SupportView({ dict, lang, initialTab = 'contact' }: Supp
                 {t.policies?.returns?.content || (
                   isAr
                     ? 'يحق للمشتري معاينة المنتج والتأكد من مطابقته للمواصفات قبل تسليم المبلغ للمندوب. في حال وجود أي عيب مصنعي أو اختلاف جوهري عن المعروض، يُمكنك رفض الاستلام أو طلب استبدال خلال 48 ساعة بالتنسيق مع المتجر. يتدخل فريق بسطة لحل أي نزاع يطرأ بين العميل والمتجر لضمان الإنصاف.'
-                    : 'Buyers have the right to inspect goods prior to payment. If an item is defective or significantly differs from description, you may refuse delivery or request an exchange within 48 hours. Bastha mediates any disputes to ensure fair resolution.'
+                    : 'Buyers have the right to inspect goods prior to payment. If an item is defective or significantly differs from description, you may refuse delivery or request an exchange within 48 hours. Bastah mediates any disputes to ensure fair resolution.'
                 )}
               </p>
             </div>

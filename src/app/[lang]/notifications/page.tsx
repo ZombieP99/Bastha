@@ -1,5 +1,4 @@
 import NotificationsView from '@/components/notifications/NotificationsView';
-import { getDictionary } from '@/i18n/dictionaries';
 import { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -10,10 +9,10 @@ export async function generateMetadata({
   const { lang } = await params;
   const isAr = lang === 'ar';
   return {
-    title: isAr ? 'مركز الإشعارات | بسطة' : 'Notifications | Bastha',
+    title: isAr ? 'مركز الإشعارات | بسطة' : 'Notifications | Bastah',
     description: isAr 
       ? 'مركز الإشعارات لمنصة بسطة. تابع تحديثات الطلبات والعروض الحصرية.' 
-      : 'Bastha notification center. Track your orders and local deals.',
+      : 'Bastah notification center. Track your orders and local deals.',
   };
 }
 
@@ -23,7 +22,6 @@ export default async function NotificationsPage({
   params: Promise<{ lang: 'en' | 'ar' }>;
 }) {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
 
-  return <NotificationsView dict={dict} lang={lang} />;
+  return <NotificationsView lang={lang} />;
 }

@@ -22,7 +22,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bastha | بسطة",
+  title: "Bastah | بسطة",
   description: "تجارة بسيطة للجميع. نربطك بأفضل المتاجر المحلية.",
 };
 

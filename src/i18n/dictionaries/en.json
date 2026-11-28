@@ -1,6 +1,6 @@
 {
   "common": {
-    "searchPlaceholder": "Search for products, stores, or offers...",
+    "searchPlaceholder": "Search products, shops or categories...",
     "login": "Login",
     "register": "Sign Up Free",
     "currency": "₪"
@@ -12,7 +12,7 @@
     "bestOffers": "Best Offers",
     "newArrivals": "New Arrivals",
     "bestSellers": "Best Sellers",
-    "sellWithUs": "Sell with Bastha"
+    "sellWithUs": "Sell with Bastah"
   },
   "hero": {
     "badge": "Limited Time Offer",
@@ -70,7 +70,7 @@
       "subtitle": "Get the latest offers and updates directly in your inbox.",
       "placeholder": "Email Address"
     },
-    "copyright": "© 2024 Bastha. Simple commerce for everyone."
+    "copyright": "© 2024 Bastah. Simple commerce for everyone."
   },
   "floatingButton": "Start Selling Today",
   "shopsPage": {
@@ -113,7 +113,7 @@
     "signup": "Sign Up",
     "welcomeBack": "Welcome Back!",
     "welcomeBackDesc": "Please login to access your account",
-    "joinUs": "Welcome to Bastha",
+    "joinUs": "Welcome to Bastah",
     "joinUsDesc": "Join us today and start your business journey with ease",
     "accountType": "Account Type",
     "customer": "Customer",
@@ -132,7 +132,7 @@
     "noAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "forgotPassword": "Forgot Password?",
-    "sideTitle": "Bastha makes commerce easier",
+    "sideTitle": "Bastah makes commerce easier",
     "sideDesc": "We are here to connect you with the best stores or to help you showcase your products to the world simply and smoothly.",
     "feature1": "Reliable",
     "feature2": "Fast",
@@ -207,7 +207,7 @@
         },
         {
           "q": "How does payment work?",
-          "a": "Payment on Bastha is cash on delivery only. Electronic payment options are not currently supported. You pay the merchant directly upon receiving your order."
+          "a": "Payment on Bastah is cash on delivery only. Electronic payment options are not currently supported. You pay the merchant directly upon receiving your order."
         },
         {
           "q": "How long does delivery take?",
@@ -222,8 +222,8 @@
           "a": "You can track your order status from 'My Orders' in your profile. You will also receive notifications whenever your order status changes."
         },
         {
-          "q": "How do I become a seller on Bastha?",
-          "a": "Click 'Sell with Bastha' in the navigation bar, create a merchant account, and submit your store details. Our team will review and approve your request."
+          "q": "How do I become a seller on Bastah?",
+          "a": "Click 'Sell with Bastah' in the navigation bar, create a merchant account, and submit your store details. Your shop is active as soon as registration succeeds."
         }
       ]
     },
@@ -232,15 +232,15 @@
       "subtitle": "Read our policies carefully to understand your rights and responsibilities",
       "privacy": {
         "title": "Privacy Policy",
-        "content": "At Bastha, we respect your privacy and are committed to protecting your personal data. We only collect necessary information to run the service and improve your experience. We never sell your data to third parties. You have the right to request deletion of your account and data at any time."
+        "content": "At Bastah, we respect your privacy and are committed to protecting your personal data. We only collect necessary information to run the service and improve your experience. We never sell your data to third parties. You have the right to request deletion of your account and data at any time."
       },
       "terms": {
         "title": "Terms of Service",
-        "content": "By using the Bastha platform, you agree to the following terms: use the platform for legitimate purposes only, provide accurate information during registration, and respect other buyers and sellers. Bastha reserves the right to suspend any account that violates these terms."
+        "content": "By using the Bastah platform, you agree to the following terms: use the platform for legitimate purposes only, provide accurate information during registration, and respect other buyers and sellers. Bastah reserves the right to suspend any account that violates these terms."
       },
       "returns": {
         "title": "Return Policy",
-        "content": "Buyers may request to return a product within 48 hours of receipt if it is damaged or does not match its description. Returns are coordinated directly with the respective merchant. Bastha mediates any disputes between buyer and seller."
+        "content": "Buyers may request to return a product within 48 hours of receipt if it is damaged or does not match its description. Returns are coordinated directly with the respective merchant. Bastah mediates any disputes between buyer and seller."
       }
     }
   },

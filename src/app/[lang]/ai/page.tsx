@@ -25,7 +25,7 @@ export default function AIPage({ params }: { params: Promise<{ lang: string }> }
       type: 'ai',
       text: isAr
         ? 'مرحباً! أساعدك في استخدام بسطة والوصول إلى المنتجات والطلبات. لا أطلع على الأسعار أو المخزون أو بيانات طلباتك مباشرة.'
-        : "Hello! I can explain how to use Bastha and find products and orders. I do not have live prices, inventory, or access to your orders."
+        : "Hello! I can explain how to use Bastah and find products and orders. I do not have live prices, inventory, or access to your orders."
     }
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -106,7 +106,7 @@ export default function AIPage({ params }: { params: Promise<{ lang: string }> }
             </div>
             <div>
               <h1 className="text-xl font-extrabold text-[#1a365d] flex items-center gap-2">
-                {isAr ? 'بسطة AI' : 'Bastha AI'}
+                {isAr ? 'بسطة AI' : 'Bastah AI'}
                 <Sparkles className="w-4 h-4 text-yellow-500" />
               </h1>
               <p className="text-sm text-gray-500 font-medium">
@@ -220,7 +220,7 @@ export default function AIPage({ params }: { params: Promise<{ lang: string }> }
           </form>
 
           <p className="text-center text-xs text-gray-400 mt-4">
-            {isAr ? 'بسطة AI قد يخطئ أحياناً، يرجى التأكد من المعلومات.' : 'Bastha AI can make mistakes. Consider verifying important info.'}
+            {isAr ? 'بسطة AI قد يخطئ أحياناً، يرجى التأكد من المعلومات.' : 'Bastah AI can make mistakes. Consider verifying important info.'}
           </p>
         </div>
 

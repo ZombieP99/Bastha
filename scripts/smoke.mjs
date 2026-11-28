@@ -3,7 +3,7 @@ const routes = [
  ['/',307],['/ar',200],['/en',200],['/ar/auth',200],['/en/auth',200],
  ['/ar/search?q=test&page=2',200],['/ar/orders',200],['/ar/profile',200],
  ['/ar/checkout/success?orders=bad',200],['/ar/seller/dashboard',200],
- ['/ar/seller/products/new',200],['/ar/support',200],['/robots.txt',200],['/sitemap.xml',200],
+ ['/ar/offers',200],['/en/offers',200],['/ar/admin/dashboard',200],['/ar/profile/edit',200],['/ar/seller/profile',200],['/ar/seller/products/new',200],['/ar/support',200],['/robots.txt',200],['/sitemap.xml',200],
  ['/ar/products?page=abc',200],['/ar/shops',200],['/ar/not-a-page',404]
 ];
 let failed = false;

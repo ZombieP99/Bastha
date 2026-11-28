@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '@/lib/config';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Category, Product, Shop } from '@/types';
+import { errorMessage } from './errors';
 import axios from 'axios';
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -43,8 +44,8 @@ export const getCategories = async (): Promise<Category[]> => {
     return data.categories || [];
 };
 // Shops
-export const getShops = async (): Promise<Shop[]> => {
-    const { data } = await api.get('/shops');
+export const getShops = async (params?: {owner?:string;deliversTo?:string}): Promise<Shop[]> => {
+    const { data } = await api.get('/shops',{params});
     return data.shops || [];
 };
 export const getTopShops = async (limit: number = 10): Promise<Shop[]> => {
@@ -106,29 +107,29 @@ export const getProductListings = async (productId: string) => {
     const { data } = await api.get(`/products/${productId}/listings`);
     return data as { product: Product; listings: import('@/types').Listing[] };
 };
-// Notifications API
-export const getNotificationsApi = async () => {
-    const { data } = await api.get('/notifications');
-    return data.notifications || data || [];
-};
-export const markNotificationReadApi = async (id: string) => {
-    const { data } = await api.patch(`/notifications/${id}/read`);
+export type SearchType = 'products' | 'shops' | 'categories';
+export type SearchCounts = Record<SearchType, number>;
+export async function searchGroup<T extends SearchType>(type: T, q: string, page: number) {
+    type Item = {products: Product; shops: Shop; categories: Category}[T];
+    const {data} = await api.get<{results: Item[]; total: number}>('/search', {params: {type, q, page, limit: 20}});
     return data;
-};
-export const markAllNotificationsReadApi = async () => {
-    const { data } = await api.put('/notifications/read-all');
+}
+export async function searchMarketplace(q:string) {
+    const {data}=await api.get<{products:Product[];shops:Shop[];categories:Category[];counts:SearchCounts}>('/search',{params:{q}});
     return data;
-};
-export const deleteNotificationApi = async (id: string) => {
-    const { data } = await api.delete(`/notifications/${id}`);
-    return data;
-};
+}
 export default api;
 api.interceptors.response.use(response => response, error => {
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
+    if ((error.response?.status === 401 || error.response?.data?.code === 'account_suspended') && typeof window !== 'undefined') {
         const token = useAuthStore.getState().token;
-        if (token && error.config?.headers?.Authorization === 'Bearer ' + token)
+        if (token && error.config?.headers?.Authorization === 'Bearer ' + token) {
+            const role = useAuthStore.getState().user?.role;
+            const lang = window.location.pathname.startsWith('/ar/') ? 'ar' : 'en';
+            const message = errorMessage(error);
+            if (message) sessionStorage.setItem('bastah-session-message', message);
             useAuthStore.getState().logout();
+            window.location.replace('/' + lang + (role === 'seller' || role === 'admin' ? '/' + role + '/login' : '/auth?mode=login'));
+        }
     }
     return Promise.reject(error);
 });

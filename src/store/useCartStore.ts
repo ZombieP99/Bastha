@@ -9,11 +9,13 @@ export interface CartListing {
   price: number;
   inStock: boolean;
   shop: { _id: string; name: string; area: string; phone: string };
-  product: { _id: string; name: string; nameAr: string; imageUrl: string; unit: string };
+  product: { _id: string; name: string; nameAr: string; imageUrl: string; unit: string; isActive?: boolean };
 }
 
 export interface CartItem {
-  listing: CartListing;
+  listing: CartListing | null;
+  listingId?: string;
+  _id?: string;
   quantity: number;
 }
 
@@ -31,8 +33,8 @@ interface CartState {
 }
 
 
-function availableItems(items: CartItem[]): CartItem[] {
- return items.filter(item=>item.listing && item.listing.product && item.listing.shop);
+export function hasCartListing(item: CartItem): item is CartItem & { listing: CartListing } {
+  return Boolean(item.listing?.product && item.listing?.shop);
 }
 export const useCartStore = create<CartState>()((set, get) => ({
   items: [],
@@ -52,12 +54,10 @@ export const useCartStore = create<CartState>()((set, get) => ({
     try {
       const res = await api.get('/cart');
       if (useAuthStore.getState().token !== requestToken) return;
-      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+      set({ items: res.data.cart.items || [], isLoading: false });
     } catch (err: unknown) {
       if (useAuthStore.getState().token !== requestToken) return;
-      console.error('Failed to fetch cart', err);
-      // In case of 401 or 404, we just treat it as empty
-      set({ items: [], isLoading: false, error: errorMessage(err, 'Failed to fetch cart') });
+      set({ isLoading: false, error: errorMessage(err, 'Failed to fetch cart') });
     }
   },
 
@@ -73,7 +73,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
     try {
       const res = await api.post('/cart/items', { listing: listingId, quantity });
       if (useAuthStore.getState().token !== requestToken) return;
-      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+      set({ items: res.data.cart.items || [], isLoading: false });
     } catch (err: unknown) {
       if (useAuthStore.getState().token !== requestToken) return;
       set({ isLoading: false, error: errorMessage(err, 'Failed to add item') });
@@ -88,7 +88,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
     try {
       const res = await api.delete(`/cart/items/${listingId}`);
       if (useAuthStore.getState().token !== requestToken) return;
-      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+      set({ items: res.data.cart.items || [], isLoading: false });
     } catch (err: unknown) {
       if (useAuthStore.getState().token !== requestToken) return;
       set({ isLoading: false, error: errorMessage(err, 'Failed to remove item') });
@@ -103,7 +103,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
     try {
       const res = await api.patch(`/cart/items/${listingId}`, { quantity });
       if (useAuthStore.getState().token !== requestToken) return;
-      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+      set({ items: res.data.cart.items || [], isLoading: false });
     } catch (err: unknown) {
       if (useAuthStore.getState().token !== requestToken) return;
       set({ isLoading: false, error: errorMessage(err, 'Failed to update quantity') });
@@ -117,7 +117,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
     try {
       const res = await api.delete('/cart');
       if (useAuthStore.getState().token !== requestToken) return;
-      set({ items: availableItems(res.data.cart.items || []), isLoading: false });
+      set({ items: res.data.cart.items || [], isLoading: false });
     } catch (err: unknown) {
       if (useAuthStore.getState().token !== requestToken) return;
       set({ isLoading: false, error: errorMessage(err, 'Failed to clear cart') });
@@ -125,7 +125,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
   },
 
   getTotalItems: () => get().items.reduce((sum,item)=>sum+item.quantity,0),
-  getTotalPrice: () => get().items.reduce((total, item) => total + (item.listing.price * item.quantity), 0),
+  getTotalPrice: () => get().items.reduce((total, item) => total + ((item.listing?.price ?? 0) * item.quantity), 0),
 }));
 
 useAuthStore.subscribe((state, previous) => {

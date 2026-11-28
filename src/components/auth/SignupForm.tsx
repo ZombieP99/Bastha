@@ -1,4 +1,5 @@
 'use client';
+import { afterCustomerLogin } from '@/lib/shopping-login';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { Dictionary } from '@/types/dictionary';
 import { motion } from 'framer-motion';
@@ -32,7 +33,7 @@ export default function SignupForm({ dict, isAr, lang }: SignupFormProps) {
     clearError();
     try {
       await register(formData);
-      router.push(`/${lang}`);
+      router.replace(afterCustomerLogin(lang, window.location.search));
     } catch {
       // Error is handled by store
     }

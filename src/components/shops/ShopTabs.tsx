@@ -12,17 +12,18 @@ import { Product } from './ProductCard';
 import ProductGrid from './ProductGrid';
 
 interface ShopTabsProps {
+  reviewsInitiallyOpen?: boolean;
   shop: Shop;
   products: Product[];
   dict: Dictionary;
   lang: string;
 }
 
-export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) {
+export default function ShopTabs({ shop, products, dict, lang, reviewsInitiallyOpen }: ShopTabsProps) {
   const isAr = lang === 'ar';
   
   // Tabs: 'overview' | 'products' | 'reviews'
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'reviews'>(reviewsInitiallyOpen ? 'reviews' : 'overview');
 
   // Review Form States
   const [rating, setRating] = useState(0);
@@ -30,6 +31,8 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
   const [comment, setComment] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const user=useAuthStore(s=>s.user);
+  const [editing,setEditing]=useState<Review | null>(null),[version,setVersion]=useState(0);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -38,7 +41,7 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
     let active=true;
     api.get<{reviews:Review[];total:number}>(`/shops/${shop._id}/reviews?page=${page}`).then(({data})=>{if(active){setReviews(data.reviews);setTotal(data.total);setReviewError('');}}).catch(error=>{if(active)setReviewError(errorMessage(error));});
     return ()=>{active=false;};
-  },[shop._id,page,isSubmitted]);
+  },[shop._id,page,isSubmitted,version]);
   const submitReview = async () => {
     if(useAuthStore.getState().user?.role !== 'customer') {toast.error(isAr?'سجل الدخول بحساب زبون':'Log in as a customer');return;}
     if(submitting)return;
@@ -104,10 +107,24 @@ export default function ShopTabs({ shop, products, dict, lang }: ShopTabsProps) 
           )}
 
           {activeTab === 'reviews' && (
-            <div className={`bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm ${isAr ? 'text-right' : 'text-left'}`}>
+            <div id="reviews" className={`bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm ${isAr ? 'text-right' : 'text-left'}`}>
               
               {reviewError && <p role="alert">{reviewError}</p>}
-              <div className="space-y-4 mb-8">{reviews.map(review=><article key={review._id} className="border-b pb-4"><strong>{review.author?.name}</strong><p>{review.rating} / 5</p><p>{review.comment}</p></article>)}</div>
+              <div className="space-y-4 mb-8">{reviews.map(review=><article key={review._id} className="border-b pb-4"><strong>{review.author?.name}</strong><p>{review.rating} / 5</p><p>{review.comment}</p>
+                {user && review.author?._id === (user.id || user._id) && <button className="underline me-4" onClick={()=>setEditing(review)}>{isAr?'تعديل':'Edit'}</button>}
+                {user && (review.author?._id === (user.id || user._id) || user.role==='admin') && <button disabled={submitting} onClick={async()=>{
+                  if(!window.confirm(isAr?'حذف التقييم؟':'Delete review?'))return;
+                  setSubmitting(true);
+                  try{await api.delete('/reviews/'+review._id);setEditing(null);setIsSubmitted(false);setPage(1);setVersion(v=>v+1);}catch(e){toast.error(errorMessage(e));}finally{setSubmitting(false);}
+                }}>{isAr?'حذف':'Delete'}</button>}
+              </article>)}</div>
+              {editing && <form key={editing._id} className="mb-4 grid gap-2" onSubmit={async e=>{
+                e.preventDefault();const fields=new FormData(e.currentTarget);setSubmitting(true);
+                try{await api.patch('/reviews/'+editing._id,{rating:Number(fields.get('rating')),comment:fields.get('comment')});setEditing(null);setVersion(v=>v+1);}
+                catch(err){toast.error(errorMessage(err));}finally{setSubmitting(false);}
+              }}><label>{isAr?'التقييم':'Rating'} <input type="number" name="rating" min="1" max="5" required defaultValue={editing.rating}/></label>
+              <label>{isAr?'التعليق':'Comment'} <textarea name="comment" defaultValue={editing.comment}/></label>
+              <button disabled={submitting}>{isAr?'حفظ':'Save'}</button><button type="button" onClick={()=>setEditing(null)}>{isAr?'إلغاء':'Cancel'}</button></form>}
               {total > 20 && <nav className="flex gap-4 mb-8"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)}>{isAr?'السابق':'Previous'}</button><span>{page} / {Math.ceil(total/20)}</span><button disabled={page>=Math.ceil(total/20)} onClick={()=>setPage(p=>p+1)}>{isAr?'التالي':'Next'}</button></nav>}
               {!isSubmitted ? (
                 <div>

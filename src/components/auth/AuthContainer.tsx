@@ -2,6 +2,7 @@
 import type { Dictionary } from '@/types/dictionary';
 import { AnimatePresence,motion } from 'framer-motion';
 import { HeadphonesIcon,ShieldCheck,Zap } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
@@ -121,6 +122,11 @@ export default function AuthContainer({ dict, lang, initialMode = 'login' }: Aut
                   {isLogin ? dict?.auth?.signup : dict?.auth?.login}
                 </button>
               </p>
+              <Link href={`/${lang}/seller/${isLogin ? 'login' : 'register'}`} className="mt-3 inline-block text-sm font-bold text-[#1a365d] hover:underline">
+                {isLogin
+                  ? (isAr ? 'تسجيل الدخول بحساب تاجر' : 'Sign in as a seller')
+                  : (isAr ? 'إنشاء حساب تاجر' : 'Create a seller account')}
+              </Link>
             </div>
 
           </motion.div>

@@ -1,3 +1,4 @@
+import OfferList from '@/components/offers/OfferList';
 import { readShop } from '@/lib/catalog.server';
 import type { Metadata } from 'next';
 import ShopDetailsHeader from '@/components/shops/ShopDetailsHeader';
@@ -5,13 +6,16 @@ import ShopTabs from '@/components/shops/ShopTabs';
 import { getDictionary } from '@/i18n/dictionaries';
 import { getShopProducts } from '@/lib/api';
 import axios from 'axios';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 export default async function ShopDetailsPage({
-  params,
+  params, searchParams,
 }: {
+  searchParams: Promise<{tab?: string}>;
   params: Promise<{ lang: string; shopId: string }>;
 }) {
+  const reviews = (await searchParams).tab === 'reviews';
   const resolvedParams = await params;
   const lang = resolvedParams.lang;
   const shopId = resolvedParams.shopId;
@@ -29,7 +33,6 @@ export default async function ShopDetailsPage({
       name: lang === 'ar' ? l.product.nameAr : l.product.name,
       description: l.product.description || '',
       price: l.price,
-      image: l.product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop',
       inStock: l.inStock,
       category: typeof l.product.category === 'object' ? (lang === 'ar' ? l.product.category.nameAr : l.product.category.name) : '',
     }));
@@ -51,11 +54,13 @@ export default async function ShopDetailsPage({
       {/* Main Content Area */}
       <div className="container mx-auto px-4 md:px-8">
         
-        <ShopTabs shop={shop} products={products} dict={dict} lang={lang} />
+        {typeof shop.owner==='object' && shop.owner?._id && <Link className="my-3 inline-block underline" href={'/'+lang+'/shops?owner='+shop.owner._id}>{lang==='ar'?'متاجر هذا التاجر':'Shops by this seller'}</Link>}
+        <OfferList key={shopId} lang={lang} shop={shopId}/>
+        <ShopTabs key={String(reviews)} reviewsInitiallyOpen={reviews} shop={shop} products={products} dict={dict} lang={lang} />
         
       </div>
     </div>
   );
 }
 
-export async function generateMetadata({params}:{params:Promise<{lang:string;shopId:string}>}):Promise<Metadata>{const {lang,shopId}=await params;try{const shop=await readShop(shopId);return {title:shop.name+' | Bastha',description:shop.description,alternates:{languages:{ar:'/ar/shops/'+shopId,en:'/en/shops/'+shopId}}};}catch{return {title:lang==='ar'?'المتجر | بسطة':'Shop | Bastha'};}}
+export async function generateMetadata({params}:{params:Promise<{lang:string;shopId:string}>}):Promise<Metadata>{const {lang,shopId}=await params;try{const shop=await readShop(shopId);return {title:shop.name+' | Bastah',description:shop.description,alternates:{languages:{ar:'/ar/shops/'+shopId,en:'/en/shops/'+shopId}}};}catch{return {title:lang==='ar'?'المتجر | بسطة':'Shop | Bastah'};}}

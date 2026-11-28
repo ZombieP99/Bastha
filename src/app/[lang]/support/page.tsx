@@ -10,10 +10,10 @@ export async function generateMetadata({
   const { lang } = await params;
   const isAr = lang === 'ar';
   return {
-    title: isAr ? 'مركز الدعم والمساعدة | بسطة' : 'Support Center | Bastha',
+    title: isAr ? 'مركز الدعم والمساعدة | بسطة' : 'Support Center | Bastah',
     description: isAr 
       ? 'مركز الدعم والمساعدة لمنصة بسطة. تواصل معنا، وتصفح الأسئلة الشائعة وسياسات المنصة.' 
-      : 'Bastha support center. Contact us, browse FAQs, and review our platform policies.',
+      : 'Bastah support center. Contact us, browse FAQs, and review our platform policies.',
   };
 }
 

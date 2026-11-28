@@ -105,7 +105,7 @@ export default function FloatingButton({ lang }: { dict: Dictionary, lang: strin
                 </div>
                 <div>
                   <h3 className="font-bold flex items-center gap-1 text-sm">
-                    {isAr ? 'بسطة AI' : 'Bastha AI'}
+                    {isAr ? 'بسطة AI' : 'Bastah AI'}
                     <Sparkles className="w-3 h-3 text-yellow-300" />
                   </h3>
                   <p className="text-xs text-blue-100">{isAr ? 'متصل دائماً' : 'Always online'}</p>

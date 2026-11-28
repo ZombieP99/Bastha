@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   phone: string;
+  notificationPrefs?: { offers: boolean; alerts: boolean };
   role: 'customer' | 'seller' | 'admin';
   createdAt?: string;
 }
@@ -43,13 +44,14 @@ export interface Product {
   description?: string;
   category?: Category | string;
   unit?: string;
-  imageUrl?: string;
+  imageUrl: string;
   isFeatured: boolean;
   createdAt: string;
   updatedAt?: string;
 }
 
 export interface Listing {
+  priceConfirmedAt?: string | null;
   _id: string;
   price: number;
   inStock: boolean;
@@ -70,4 +72,4 @@ export interface Order {
   deliveryAddress?: { area?: { name: string; nameAr: string }; details?: string };
   items: { productName: string; productNameAr: string; quantity: number; priceAtOrder: number }[];
 }
-export interface Review { _id: string; rating: number; comment?: string; author: { name: string }; createdAt: string }
+export interface Review { _id: string; rating: number; comment?: string; author: { _id?:string; name: string }; createdAt: string }
